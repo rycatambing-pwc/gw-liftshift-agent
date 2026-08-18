@@ -2,7 +2,7 @@
 document: gw-build-agent
 purpose: Specialized agent for executing Gradle builds, diagnosing build failures, and troubleshooting PolicyCenter compilation issues
 scope: Build execution, dependency resolution, code generation, WAR packaging, Gradle task orchestration
-tools:  Read, Write, Edit, Bash, Grep, Glob
+tools:  Read, Write, Edit, Bash, Grep, Glob, Task
 model:  claude-opus-4-6
 ---
 
