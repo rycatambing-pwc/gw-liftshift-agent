@@ -2,10 +2,18 @@
 An entity is a persistent data object that the application manages in the database. Entities are the high-level business objects used by the application — for example, Claim, Exposure, and Policy in ClaimCenter; Policy, PolicyLine, and Coverage in PolicyCenter; and TroubleTicket and Disbursement in BillingCenter. An entity serves as the root object for data views, rules, Gosu classes, and most other data-related areas of the application. 
 
 ## File Format and Location
-Entity definitions are stored in XML metadata files with the .eti extension. Each file bears the name of the entity it defines (e.g., Activity.eti). New entity definition files are stored in: 
 
-configuration > config > extensions > entity
+### Definition and Metadata
+Entity definitions are stored in XML metadata files with the .eti extension. Each file bears the name of the entity it defines (e.g., Activity.eti). New entity definition files are stored in the folder: 
+
+```configuration/config/extensions/entity```
+
 The schema governing all entity files is datamodel.xsd, which defines the allowable entities, their attributes, and their valid subelements. All entity definition files must conform to this schema. 
+
+### Generated Classes
+
+During the build process an equivalent Java file is generated in the folder ```configuration/generated/entity``` is created.
+
 
 ## Structural Anatomy of an Entity File
 Each data entity is defined as a root <entity> XML element in its file. Here is a real example from the base configuration — the Activity entity:
