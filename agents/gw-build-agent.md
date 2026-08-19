@@ -165,26 +165,90 @@ The primary application module:
 
 ## Common Build Tasks
 
+### Core Application Tasks
+
 | Task | Description |
 |---|---|
-| `gwb compile` | Compile all sources (Gosu + Java) |
-| `gwb clean` | Clean build outputs |
-| `gwb dropDb` | Drop and recreate the database |
-| `gwb runServer` | Start the PolicyCenter application server |
-| `gwb stopServer` | Stop a running server |
-| `gwb genEntity` | Entity code generation |
-| `gwb genPcf` | PCF code generation |
-| `gwb genProductModel` | Product model code generation |
-| `gwb genXml` | XML code generation |
-| `gwb warTomcatDbcp` | Build WAR for Tomcat with DBCP |
-| `gwb packageSolr` | Package Solr configuration |
-| `gwb ccTypelistGen` | Export typelists for ClaimCenter |
-| `gwb ratePlanStudioSetup` | Download rate plan JARs from Artifactory |
-| `gwb generateCloudRatingCustomRateFunctionZip` | Package cloud rating functions |
-| `gwb flattenConfiguration` | Flatten configuration (does not require compile) |
-| `gwb genExternalEntitySources` | Generate external entity sources (does not require compile) |
-| `gwb jsonSchemaCodegen` | JSON schema code generation (does not require compile) |
-| `gwb gosudoc` | Generate Gosu documentation (replaces deprecated `regen-gosu-api`) |
+| `gwb clean` | Delete the build directories |
+| `gwb cleanIdea` | Delete Studio project files (.iml, .idea) |
+| `gwb codegen` | Generate entities, PCFs, permissions, and other sources |
+| `gwb compile` | Compile Java sources, re-generate sources, OSGi metadata, and prepare Web application. Pass `-DincludeGtest=true` to compile sources in gtest |
+| `gwb dropDb` | Drop all database tables |
+| `gwb idea` | Generate Studio project |
+| `gwb inspect` | Run Guidewire Studio Inspections |
+| `gwb runServer` | Start the Guidewire application server |
+| `gwb stopServer` | Stop the Guidewire application server |
+| `gwb studio` | Start Guidewire Studio |
+
+### Configuration Upgrade Tasks
+
+| Task | Description |
+|---|---|
+| `gwb compareConfigs` | Compares two InsuranceSuite application configurations to determine what kind of upgrade is required to migrate from the source to the destination. For detailed info run `gwb -q help --task compareConfigs` |
+| `gwb genRuleReport` | Build the rule repository report |
+
+### Application Server Tasks
+
+| Task | Description |
+|---|---|
+| `gwb earWeblogicDbcp` | Build the EAR file for Weblogic including JDBC drivers |
+| `gwb earWeblogicJndi` | Build the EAR file for Weblogic without JDBC drivers |
+| `gwb earWebsphereDbcp` | Build the EAR file for Websphere including JDBC drivers |
+| `gwb earWebsphereJndi` | Build the EAR file for Websphere without JDBC drivers |
+| `gwb warJbossDbcp` | Build the WAR file for Jboss including JDBC drivers |
+| `gwb warJbossJndi` | Build the WAR file for Jboss without JDBC drivers |
+| `gwb warTomcatDbcp` | Build the WAR file for Tomcat including JDBC drivers |
+| `gwb warTomcatJndi` | Build the WAR file for Tomcat without JDBC drivers |
+
+### Globalization Tasks
+
+| Task | Description |
+|---|---|
+| `gwb diffDisplayKeys` | Generate missing display keys in 'missing-display-keys' directory |
+| `gwb exportLocalizations` | Export localizations, requires `-Dexport.file=<translation file> -Dexport.language=<destination language>` |
+| `gwb importLocalizations` | Import localized resources from the named file for the named language. Requires `-Dimport.file=<translation file> -Dimport.language=<destination language>` |
+
+### Integration Tasks
+
+| Task | Description |
+|---|---|
+| `gwb exportWsdl` | Export the WSDL for WSI web services in wsdl |
+| `gwb genExternalSchemas` | Generates external JSON, Swagger JSON and XSD schemas for internal integration JSON and Swagger schemas. For detailed info run `gwb -q help --task genExternalSchemas` |
+| `gwb genFromWsc` | Build WSC meta-information. Run this command whenever there are new .wsc files containing web service URLs available to generate the web service stub code. Place all WSC files in the configuration module |
+| `gwb genWsiLocal` | Generate the WSDL for WSI web services in gsrc/wsi/local |
+| `gwb jsonSchemaCodegen` | Generates code for the json schemas in codegen-schemas.txt file. For detailed info run `gwb -q help --task jsonSchemaCodegen` |
+| `gwb restEndpointGenerator` | Bootstraps Cloud API Endpoints for custom entities. For detailed info consult docs |
+| `gwb updateReleasedSchemaVersions` | Updates versioned Integration View and REST API schemas. For detailed info run `gwb -q help --task updateReleasedSchemaVersions` |
+
+### Documentation Tasks
+
+| Task | Description |
+|---|---|
+| `gwb genDataDictionary` | Build the Data Dictionary and Security Dictionary in HTML, and the Data Dictionary in XML. To build in XML only, use `-DoutputFormat=xml` |
+| `gwb genEntityModelXml` | Generate the entity model in XML format |
+
+### Plugin Development Tasks
+
+| Task | Description |
+|---|---|
+| `gwb genJavaApi` | Build the Java API toolkit. Add `-Ddeprecated=true` to additionally generate the deprecated Java APIs |
+
+### Other Tasks
+
+| Task | Description |
+|---|---|
+| `gwb ccTypelistGen` | Export Policy Center product model as typelists to Claim Center, requires `-Dinput_dir=<input directory> -Doutput_dir=<output directory> -Dmap_coverages=<true/false> -Dcc_app_version=<8/9>` |
+| `gwb genDataMapping` | Build the data mapping files with all tables and typelists concatenated. Use `-Dsplit=true` to split out the tables and typelists |
+| `gwb genImportAdminDataXsd` | Regenerate the XSD files for importing administrative data |
+| `gwb genPcfMapping` | Build the PCF mappings |
+| `gwb genPhoneMetadata` | Regenerates phone metadata in config/phone/data. Run this target if you have modified the phone metadata XML files |
+| `gwb mergeModule` | Merge given configuration module on top of 'configuration', requires `-Dmerge.module=<module directory>` |
+| `gwb packageSolr` | Regenerate the Solr zip file |
+| `gwb runSuite` | Run test suite |
+| `gwb verifyExtConfig` | Performs a verification of external property substitution to find errors |
+| `gwb verifyResources` | Check PCF, Annotation, GxModel, RestIView, Workflow, Types. Can use `-Dresource.types=<types>` to limit types property |
+| `gwb version` | Print information on the Guidewire application build and third-party application versions |
+| `gwb zipChangedConfig` | Create a named archive in ZIP format containing any changed configuration files. Required: `-DoutputFile=<filename>`; optional: `-Dexclude=<exclude list>`, `-DappRootDirectory=<dir>` |
 
 ---
 
