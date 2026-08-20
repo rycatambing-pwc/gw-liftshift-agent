@@ -13,16 +13,22 @@ This workflow will be followed by the agents when executing each of the steps in
     - log if the exit criteria are met or not
     - Notify the user before proceeding do not continue without confirmation.
 6. Before troubleshooting lookup if there are solutions in the lessons folder located in  ```.pwc/agent/lessons```
-
+7. Instruct the agents that LOB code is case insensitive. 
 
 ## Guidewire Policy Center LOB Removal Workflow 
+
+0. **Common Tasks**
+    - Before opening any terminal run the batch file ```pc-init-env.bat```.  This batch file will set the environment variables before running any gwb related tasks. If you cannot find the batch file, then create one, it should set the following environment variables:
+        - JAVA_HOME environment variable that is at least JDK 21
+        - IDEA_HOME - environment variable at least version from 2024 onwards.
 
 1.  **Establish the Baseline**
     The intent of this section is to establish that the current Guidewire Policy Center is configured correctly with the tools installed in the host machine. 
 
     **Tasks:**
+    
     - [ ] Run skill pc-current-state
-    - [ ] Ask the user to disable the APD / Iapd Service Plugin
+    - [ ] Ask the user to disable the APD / Iapd Service Plugin    
     - [ ] Open a terminal
     - [ ] Run in the terminal gwb clean
     - [ ] Run in the terminal gwb compile
