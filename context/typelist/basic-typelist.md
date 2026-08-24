@@ -44,7 +44,34 @@ Unqualified: No qualifier in the file name (e.g., Foo.ttx). Each extendable type
 Qualified: Has a qualifier in the file name (e.g., Foo.bar.ttx, where bar is the qualifier). A typelist may have any number of qualified extensions.
 Qualified extensions may reference typecodes defined in the unqualified extension.
 
+### Creating vs. Extending a Typelist
 
+Before making a typelist change, determine whether the requirement is for a new custom typelist or an extension of an existing typelist.
 
+- For a new customer-defined typelist, create a `.tti` definition in the customer extension area.
+- To add customer typecodes to an existing extendable base typelist, use a `.ttx` extension rather than modifying the base typelist.
+- Before creating a new typelist, check whether an existing base or customer typelist already represents the required business concept.
+- Before creating a `.ttx`, check whether an unqualified or qualified extension already exists for the target typelist.
 
+### Naming Rules
+
+- Typecodes added to a base application typelist should use the `_Ext` suffix.
+- Example: if `Phone.tti` is extended through `Phone.ttx`, a customer-added typecode can be named `Other_Ext`.
+- Do not assume that every typecode in a completely new customer-defined typelist requires `_Ext`. Apply the project's naming convention for new customer typelists and distinguish this case from extending a base typelist.
+- Avoid creating a new typecode whose `code` duplicates an existing base or extension typecode.
+
+### Base Configuration and Extensions
+
+A base `.tti` contains the original Guidewire typelist definition. Customer-specific typecodes are usually added through an extension instead of changing the base file. This keeps Guidewire configuration separate from custom changes.
+
+When working with an existing typelist, the requested change may belong to the base definition, an existing extension, or a new extension file. Determining which of these applies is part of understanding the current typelist structure before making a change.
+
+### Typekeys
+
+A typekey is an entity field associated with a typelist.
+
+- A typekey stores/references a value from its associated typelist.
+- When reviewing a typekey field, identify the typelist it references.
+- A typekey can reference at most one typefilter from its associated typelist.
+- If a field should allow only a subset of the typelist, check whether a typefilter is appropriate before implementing separate filtering logic elsewhere.
 
