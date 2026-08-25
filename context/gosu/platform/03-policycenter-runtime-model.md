@@ -40,11 +40,11 @@ Search in this order:
 
 Use these deeper modules:
 
-- Data model and typekeys: `04-data-model-entity-metadata-and-typelists.md`
-- Queries: `05-query-format-proposal.md`, `06-query-pattern-cards.md`, `07-query-performance-antipatterns.md`
-- PCF: `08-pcf-ui-model-and-embedded-gosu.md`
-- Rules/validation/entity names: `09-rules-validation-and-entity-names.md`
-- Bundles: `10-bundles-and-transactions.md`
+- Data model and typekeys: `platform/04-data-model-entity-metadata-and-typelists.md`
+- Queries: `queries/05-query-format-proposal.md`, `queries/06-query-pattern-cards.md`, `queries/07-query-performance-antipatterns.md`
+- PCF: `ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`
+- Rules/validation/entity names: `ui_and_rules/09-rules-validation-and-entity-names.md`
+- Bundles: `platform/10-bundles-and-transactions.md`
 
 ## Confidence rule
 

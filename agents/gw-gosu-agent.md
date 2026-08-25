@@ -62,20 +62,36 @@ Use the markdown files in `/context/gosu/` as supporting reference for Gosu-spec
 | File | When to Load |
 |------|-------------|
 | `01-quick-mental-model.md` | Always — Java-to-Gosu mental map |
-| `02-core-gosu-deltas.md` | Syntax questions, Java-to-Gosu translation |
-| `03-policycenter-runtime-model.md` | Entity behavior, runtime model |
-| `04-data-model-entity-metadata-and-typelists.md` | Entity metadata, typekeys, generated properties |
-| `05-query-format-proposal.md` | Query API structure |
-| `06-query-pattern-cards.md` | Query patterns (basic select, joins, subselects) |
-| `07-query-performance-antipatterns.md` | In-memory filtering, N+1, performance issues |
-| `08-pcf-ui-model-and-embedded-gosu.md` | PCF-embedded Gosu expressions |
-| `09-rules-validation-and-entity-names.md` | Rules, validation, entity names |
-| `10-bundles-and-transactions.md` | Bundle semantics, writable vs read-only |
-| `11-gosu-style-naming-and-enhancements.md` | Naming conventions, `_Ext`, packages, enhancements |
-| `12-logging-and-structured-logger.md` | Logging patterns |
-| `13-gunit-testing.md` | Test patterns |
-| `14-system-health-profiler-dbcc-and-inspections.md` | Profiler, inspections |
-| `15-archiving-and-domain-graph.md` | Archiving, domain graph |
+| `language/02a-syntax-basics.md` | Core syntax, null safety, type checking, enumerations, intervals |
+| `language/02b-operators-and-types.md` | Operators, structural types, dynamic/expando, reflection, dimensions, annotations |
+| `language/02c-blocks-and-closures.md` | Blocks, closures, resource cleanup, exception handling |
+| `language/02d-collections.md` | Collection creation and iterable operations |
+| `language/02e-dimensions.md` | Physical/financial quantities with unit arithmetic (IDimension, MonetaryAmount) |
+| `language/02f-structural-types.md` | Capability-based typing without inheritance (`structure` keyword) |
+| `language/02g-java-interop.md` | Java getter/setter mapping, static imports, generics reification |
+| `platform/03-policycenter-runtime-model.md` | Entity behavior, runtime model, symbol resolution |
+| `platform/04-data-model-entity-metadata-and-typelists.md` | Entity metadata, typekeys, generated properties, setFieldValue FORBIDDEN |
+| `platform/10-bundles-and-transactions.md` | Bundle semantics, writable vs read-only, field change detection |
+| `queries/05-query-format-proposal.md` | Query API structure and output format |
+| `queries/06-query-pattern-cards.md` | Query patterns (basic select, joins, subselects, distinct, paging) |
+| `queries/07-query-performance-antipatterns.md` | In-memory filtering, N+1, existence checks, performance issues |
+| `queries/30-db-connection-pool.md` | DB connection reservation for multi-query web services |
+| `ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md` | PCF-embedded Gosu expressions |
+| `ui_and_rules/09-rules-validation-and-entity-names.md` | Rules, validation, entity names |
+| `oop/11a-naming-and-packages.md` | Naming conventions, `_Ext`, packages, coding style |
+| `oop/11b-enhancements.md` | Enhancement syntax, static dispatch, .gsx files |
+| `oop/11c-annotations.md` | @AutoCreate, @AutoInsert, custom annotations, meta-annotations |
+| `oop/11d-composition.md` | Delegate-based composition and multi-interface delegation |
+| `cross_cutting/12-logging-and-structured-logger.md` | Logging patterns and CLF |
+| `cross_cutting/13-gunit-testing.md` | GUnit test patterns |
+| `cross_cutting/14-system-health-profiler-dbcc-and-inspections.md` | Profiler, inspections, LockingLazyVar, Cache, RequestVar/SessionVar |
+| `cross_cutting/15-archiving-and-domain-graph.md` | Archiving, domain graph |
+| `cross_cutting/27-checksums-fingerprints.md` | FP64 fingerprint/checksum class |
+| `cross_cutting/28-gosu-programs-cli.md` | Standalone Gosu CLI programs (.gsp) |
+| `integrations/xml-gosu.md` | XML parsing, XSD-typed access, XmlElement, Base64 |
+| `integrations/json-gosu.md` | JSON parsing, dynamic.Dynamic, structural types from JSON |
+| `integrations/templates.md` | Gosu template files (.gst), renderToString, params |
+| `integrations/dynamic-expando.md` | Dynamic types, Expando, $getProperty/$invokeMethod dispatch |
 | `90-validation-checklist.md` | Code validation checklist |
 
 Use the routing guide in `00-agent-routing.md` to determine which references to load based on code triggers.

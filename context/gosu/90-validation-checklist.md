@@ -1,55 +1,82 @@
 ---
 document: validation-checklist
-purpose: Final review checklist before an agent returns Gosu/PolicyCenter findings
-scope: Reduce hallucinations and overconfident analysis
+purpose: Pre-output gate for the gw-gosu-agent before returning code or findings
+scope: Gosu code correctness, InsuranceSuite conventions, common error prevention
 ---
 
-# Validation Checklist
+# Gosu Agent Validation Checklist
 
-Before final output, answer these.
+- [ ]
 
-## File/context
+## File and context identification
 
-- [ ] Did I identify the file type: `.gs`, `.gsx`, `.gr`, `.pcf`, `.eti`, `.etx`, `.tti`, `.ttx`, etc.?
-- [ ] Did I identify execution context: UI, rule, plugin, batch, web service, query, test?
+- [ ] Identified file type: `.gs`, `.gsx`, `.gr`, `.gst`, `.gsp`, `.pcf`, `.eti`, `.etx`, `.tti`, `.ttx`, etc.?
+- [ ] Identified execution context: UI, rule, plugin, batch, web service, query, test, CLI?
+- [ ] If `.gsx` — enhancement on which type? Dispatch is **static**, not virtual.
+- [ ] If `.gr` — which rule category (Preupdate, Validation, EventMessage)? Which root entity?
+- [ ] If `.gst` — is template large enough to risk the JVM 65535-byte method limit?
+- [ ] If `.gsp` — does code avoid entity/PCF types (not available in CLI context)?
 
 ## Symbol resolution
 
-- [ ] Did I check `.gsx` for unresolved methods/properties?
-- [ ] Did I check `.eti/.etx/.eix` for entity fields?
-- [ ] Did I check `.tti/.ttx/.tix` for typekey/typecode references?
-- [ ] Did I check PCF root variables or row iterator `elementName` where relevant?
-- [ ] Did I check generated Data Dictionary/Gosudoc/Javadoc if needed?
+- [ ] Checked `.gsx` for unresolved methods/properties before reporting them as missing?
+- [ ] Checked `.eti`/`.etx`/`.eix` for entity fields before assuming they don't exist?
+- [ ] Checked `.tti`/`.ttx`/`.tix` for typekey constants — compared as typekeys, not strings?
+- [ ] Checked PCF root variables or row iterator `elementName` if inside `.pcf`?
 
-## Gosu semantics
+## Critical Gosu correctness rules
 
-- [ ] Did I handle `==` vs `===` correctly?
-- [ ] Did I treat `Type#Field` as a feature/property reference?
-- [ ] Did I distinguish collection blocks from database predicates?
+- [ ] **`setFieldValue` NOT used** — if present, flag as FORBIDDEN and replace with property setter.
+- [ ] **`bundle.add()` return value saved** — `myEntity = bundle.add(myEntity)`, never `bundle.add(myEntity)` alone.
+- [ ] **`==` vs `===`** — `==` is structural/value equality; `===` is reference equality. Used correctly?
+- [ ] **`not`/`and`/`or`** used instead of `!`/`&&`/`||`? (Gosu convention)
+- [ ] **`construct` keyword** used for constructors, NOT `constructor`?
+- [ ] **Entity string fields** — no need to call `.trim()` before assignment; platform auto-trims.
+- [ ] **Array mutation** — `addToX()`/`removeFromX()` used for entity array relationships, not direct array assignment?
 
 ## Query semantics
 
-- [ ] Did I identify the primary entity returned?
-- [ ] Did I list predicates, joins, subselects, and ordering?
-- [ ] Did I distinguish database filtering from in-memory filtering?
-- [ ] Did I avoid treating typekey values as strings?
-- [ ] Did I identify query performance anti-patterns?
+- [ ] Identified the primary entity type returned?
+- [ ] All predicates pushed into `compare()`/`compareIn()`/`join()` before `.select()`?
+- [ ] No in-memory filtering (`.where()`, `.firstWhere()`) used as substitute for database predicates on large result sets?
+- [ ] Typekey comparisons use `typekey.TypeList.TC_Code` constants, not strings?
+- [ ] Existence check uses `result.Empty` (faster), not `result.Count == 0`?
+- [ ] INTERSECT not used — combined predicates on single query instead?
+- [ ] For multi-query web services: `@WsiReduceDBConnections` or `ConnectionUtil.executeTransactionsWithReservedConnection` considered?
 
-## Runtime/write behavior
+## Bundle and transaction
 
-- [ ] Are returned entities read-only or writable?
-- [ ] Is there a writable bundle?
-- [ ] If `bundle.add(...)` appears, is the returned writable reference modified?
-- [ ] Could bundle size/paging be a problem?
+- [ ] Is code running in automatic bundle context (UI, rules, workflows) or does it need explicit `Transaction.runWithNewBundle`?
+- [ ] All query result entities that need modification passed through `bundle.add()` with return value saved?
+- [ ] `setFieldValue` absent (FORBIDDEN)?
+- [ ] Bundle size bounded — paging and periodic commits for large batch operations?
+- [ ] `entity.remove()` preferred over `bundle.delete(entity)` where available?
 
-## PCF/rules/validation
+## Written code conventions
 
-- [ ] Did I identify root object, variables, RowIterator element names, and modes?
-- [ ] Did I distinguish UI `validationExpression` from validation rules?
-- [ ] Did I check `Validatable`, `implementsEntity`, and `triggersValidation` where relevant?
+- [ ] New methods/properties added to base GW entities have `_Ext` suffix?
+- [ ] New classes in customer package spaces (not `gw.*` or `com.guidewire.*`)?
+- [ ] Feature literals (`Entity#Property`) used for Query API comparisons, not string field names?
+- [ ] `LockingLazyVar.make(\-> ...)` used for thread-safe lazy class-level initialization (not raw null-check pattern)?
+- [ ] `ThreadLocal` NOT used — `RequestVar` or `SessionVar` preferred for request/session-scoped state?
+- [ ] Debug/trace logging guarded with `_logger.DebugEnabled`?
+- [ ] No `print(...)` statements in production code?
+
+## Integration-specific
+
+- [ ] XML: `element.bytes()` used (preferred); `element.asUTFString()` only for debugging?
+- [ ] JSON: `dynamic.Dynamic` typed properly; `@ActualName` added for non-camelCase keys?
+- [ ] Dynamic/Expando method values are blocks, not plain values?
+
+## PCF and rules
+
+- [ ] Root object, PCF variables, and row iterator `elementName` identified in scope?
+- [ ] UI `validationExpression` distinguished from validation rules (`.gr`)?
+- [ ] `Validatable`, `implementsEntity`, and `triggersValidation` checked where validation behavior is unclear?
 
 ## Final answer discipline
 
-- [ ] Separate verified facts from inferred facts.
-- [ ] State project-specific verification needed.
-- [ ] Do not claim compile correctness unless validated against target project/version.
+- [ ] Verified facts separated from inferred facts.
+- [ ] Any entity field, typelist, typecode, or LOB-specific reference that was NOT verified in project files is labeled as "needs project verification."
+- [ ] Compile correctness NOT claimed unless validated against target project/version.
+- [ ] If Gosu change requires companion changes (entity files, typelists, PCFs, display keys) — called out explicitly and delegated to the responsible agent.
