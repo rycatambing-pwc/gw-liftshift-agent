@@ -1,14 +1,14 @@
 # PCF Agent — Knowledge Base
 
-Context, rules, skills, and tools for a Claude Code agent specializing in Guidewire PCF (Page Configuration Format) development.
+Context, rules, skills, and tools for the `gw-pcf-agent` specializing in Guidewire PCF (Page Configuration Format) development.
 
 ## How this is organized
 
-- **`context/`** — background/reference knowledge. What things are, how they relate, how they work conceptually. 22 files.
-- **`rules/`** — firm, checkable conventions. "Always/never" statements. Violating these produces invalid PCF or real upgrade/performance problems, not just style issues. 9 files.
-- **`skills/`** — step-by-step, task-shaped workflows for concrete jobs ("build X," "wire up Y"). 5 real skills + 1 README.
-- **`tools/`** — debugging/inspection aids (keyboard shortcuts, editor conventions).
-- **`unresolved/`** — things that are NOT yet confirmed fact. Don't treat anything in here as ground truth; it's a tracking list of open questions and their resolution status.
+- **`context/pcf/`** — background/reference knowledge. What things are, how they relate, how they work conceptually. 22 files.
+- **`rules/pcf-agent-rules/`** — firm, checkable conventions. "Always/never" statements. Violating these produces invalid PCF or real upgrade/performance problems, not just style issues. 9 files.
+- **`skills/pcf-agent-skills/`** — step-by-step, task-shaped workflows for concrete jobs ("build X," "wire up Y"). 10 skills.
+- **`skills/pcf-find-usages/`** — find where a PCF file or element is referenced across the codebase.
+- **`tools/pcf/`** — debugging/inspection aids (keyboard shortcuts, editor conventions).
 
 ## Context Index
 
@@ -60,10 +60,15 @@ Context, rules, skills, and tools for a Claude Code agent specializing in Guidew
 | 03 | navigate-to-existing-popup | Wire a field/link to open an existing Popup |
 | 04 | creating-a-page | 6-step new Page checklist |
 | 05 | optimizing-expensive-expressions | Review/fix workflow for performance anti-patterns |
+| 06 | adding-fields-to-detail-view | Add input fields to an existing Detail View |
+| 07 | building-a-popup | Create a Popup with data-return (view/edit, create-new, search) |
+| 08 | wiring-a-toolbar-button | Add a ToolbarButton with correct placement and action |
+| 09 | creating-a-reusable-input-set | Extract shared fields into a reusable InputSet |
+| 10 | adding-a-card-to-cardview | Add a new tab to an existing CardViewPanel |
 
-## Before Using This to Generate Real PCF
+## Known Gaps
 
-Check `/unresolved/01-open-questions.md` first. Notable open items as of this compilation:
+Notable items not yet fully resolved:
 - `PanelSet`'s exact place in the container hierarchy taxonomy
 - Several minor naming-suffix and attribute-syntax gaps (List View Input widget, `locationref`'s `location` attribute syntax, navigation cell widgets)
 - The full `modules/pcf.html`/`.htm` schema reference was never directly obtained — everything here is built from Education material, real project code, and (filtered/corrected) public documentation
