@@ -1,7 +1,7 @@
 ---
 document: gosu-query-pattern-cards
 purpose: Reusable Guidewire Query API analysis cards
-scope: Entity queries, joins, subselects, row queries, result access, updates
+scope: Entity queries, joins, subselects, row queries, result access, updates, advanced query features
 ---
 
 # Query Pattern Cards
@@ -132,6 +132,7 @@ var exists = not results.Empty
 
 Analysis:
 
+- `results.Empty` is faster than `results.Count == 0` — prefer it for existence checks.
 - If actual entities are not needed, check existence rather than iterating or counting.
 - Avoid `hasMatch`, `countWhere`, and `select().Count` when only existence is needed.
 
@@ -155,7 +156,11 @@ var count = Query.make(Claim).select().Count
 Analysis:
 
 - Prefer database/result count over converting to list and counting.
-- If threshold logic is enough, use `getCountLimitedBy(n)`.
+- If threshold logic is enough, use `getCountLimitedBy(n)`:
+
+```gosu
+var tooMany = query.select().getCountLimitedBy(11) > 10
+```
 
 ## Q11: Row query / selected columns / database aggregate
 
@@ -195,3 +200,73 @@ Analysis:
 - Query-returned entities may be read-only.
 - Modify the returned value from `bundle.add(...)`, not the original read-only reference.
 - Verify exact typekey.
+
+## Q14: Distinct results
+
+```gosu
+var query = Query.make(Entity)
+query.withDistinct(true)
+query.compare(...)
+var results = query.select()
+```
+
+## Q15: Between / range filter
+
+```gosu
+var query = Query.make(Policy)
+query.between(Policy#EffectiveDate, startDate, endDate)
+var results = query.select()
+```
+
+## Q16: String contains / starts-with filters
+
+```gosu
+query.contains(Claim#Description, "collision", false)   // false = case-insensitive
+query.startsWith(Policy#PolicyNumber, "PA-", false)
+```
+
+`contains` can be expensive — add indexed predicates first. See antipatterns file.
+
+## Q17: Having clause (aggregate filter)
+
+```gosu
+query.having(...)   // applied after GROUP BY, filters aggregate results
+```
+
+## Q18: Chained ordering
+
+```gosu
+var results = query.select()
+  .orderBy(\e -> e.LastName)
+  .thenBy(\e -> e.FirstName)
+```
+
+`.orderBy()` + `.thenBy()` chains for multi-column sort after retrieval.
+
+## Q19: Paging large result sets
+
+```gosu
+var results = query.select()
+results.setPageSize(100)   // process 100 at a time
+for (entity in results) {
+  // processed in pages from DB
+}
+```
+
+## Q20: INTERSECT is an antipattern
+
+Do NOT use INTERSECT. Combine predicates on a single query instead:
+
+```gosu
+// WRONG — two queries intersected
+var q1 = Query.make(Claim)
+q1.compare(Claim#LossCause, Equals, LossCause.TC_VEHCOLLISION)
+var q2 = Query.make(Claim)
+q2.compare(Claim#State, Equals, ClaimState.TC_OPEN)
+// intersect(q1, q2) — DO NOT USE
+
+// CORRECT — single query with combined predicates
+var q = Query.make(Claim)
+q.compare(Claim#LossCause, Equals, LossCause.TC_VEHCOLLISION)
+q.compare(Claim#State, Equals, ClaimState.TC_OPEN)
+```

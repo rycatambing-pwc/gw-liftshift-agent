@@ -95,6 +95,8 @@ collection.hasMatch(\ x -> ...)
 collection.countWhere(\ x -> ...) > 0
 ```
 
+`result.Empty` is faster than `result.Count == 0` because it does not need to count all rows.
+
 ## Count threshold checks
 
 If the business logic only needs to know whether count exceeds a threshold, use limited count.
