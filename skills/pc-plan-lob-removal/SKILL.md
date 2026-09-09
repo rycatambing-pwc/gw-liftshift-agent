@@ -54,6 +54,7 @@ When generating the plan from the template:
    - The responsible agent for each task.
 6. Log all actions to `.pwc/agent/work-logs` with timestamps.
 7. Before troubleshooting any issues, check `.pwc/agent/lessons` for known solutions.
+8. Before any PCF deletion phase, instruct `gw-pcf-agent` to run the `pcf-find-usages` skill against each PCF file in the target folder. The resulting reference map drives cleanup sub-tasks in the same phase — broken references should be resolved before running `gwb codegen`, not deferred to the Milestone Check.
 
 ---
 
@@ -62,7 +63,7 @@ When generating the plan from the template:
 | Phase | Primary Agent | Notes |
 |-------|--------------|-------|
 | 1. Establish Baseline | gw-planner | Runs `pc-current-state` skill, coordinates build verification |
-| 2. Remove LOB PCF Files | gw-pcf-agent | Deletes PCF folders and files matching LOB pattern |
+| 2. Remove LOB PCF Files | gw-pcf-agent | Runs `pcf-find-usages` to map references, deletes LOB folder/files, cleans broken references in base PCFs |
 | 3. Remove Gosu Files | gw-gosu-agent | Deletes Gosu source folders and files |
 | 4. Refactor Gosu Files | gw-gosu-agent | Edits Gosu files to remove LOB references |
 | 5. BizRules Bootstrap Updates | gw-entity-agent | Removes gwrules files and entity references |
@@ -71,7 +72,7 @@ When generating the plan from the template:
 | 8. Cleanup API Enablement Config | gw-planner | Removes API YAML files, runs codegen |
 | 9. Remove Entity Extensions | gw-entity-agent | Removes entity extension files |
 | 10. Cleanup Typelist | gw-typelist-agent | Removes typelist entries and files |
-| 12. Milestone Check | gw-gosu-agent | Resolves codegen and compile errors iteratively |
+| 12. Milestone Check | gw-gosu-agent, gw-pcf-agent | gw-gosu-agent resolves compile errors; gw-pcf-agent resolves PCF reference errors from codegen |
 | 13. GUnit Test Updates | gw-gosu-agent | Fixes broken unit tests |
 
 ---

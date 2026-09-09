@@ -45,10 +45,16 @@ This workflow will be followed by the agents when executing each of the steps in
     - [ ] Delete the folder and its content under the folder ```configuration/config/web/pcf/line/[lob_code]```
     - [ ] Delete the folder ```configuration/config/productmodel/policylinepatterns/<lob>Line```
     - [ ] Delete the file following the pattern ```[lob_code]ManuscriptEndorsementPopup.pcf```
+    - [ ] Run `pcf-find-usages` against all PCF files in `configuration/config/web/pcf/line/[lob_code]` to produce a reference map of consumers
+    - [ ] Remove or update `PanelRef`/`InputSetRef` elements in base PCFs whose `def` targets a deleted file
+    - [ ] Remove `LocationRef` entries in LocationGroup PCFs pointing to deleted LOB pages
+    - [ ] Find and delete LOB-specific mode files outside the LOB folder (e.g., in `line/common/`)
+    - [ ] Remove LOB entries from shared navigation PCFs (`LineWizardStepSet`, `PolicyMenuItemSet`, etc.)
     - [ ] Next we run ```gwb codegen```, it is expected that no errors will be raised at this point.
 
     **Exit Criteria**
     - Deletion tasks are successfully completed.
+    - No broken PanelRef, InputSetRef, or LocationRef references remain in base PCFs.
     - The task ```gwb codegen``` has run successfully.
 
 3. **Remove Gosu Files**
