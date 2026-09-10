@@ -20,20 +20,20 @@ product model layers.
 Only search the directories listed below. Do not search `bin/`, `plugins/`,
 `configuration_backup/`, or any compiled output tree.
 
-| Artifact Type | Directory |
+| Artifact Type                | Directory |
 |---|---|
-| Gosu classes | `modules/configuration/gsrc/**/*.gs` |
-| Gosu enhancements | `modules/configuration/gsrc/**/*.gsx` |
-| Gosu rules | `modules/configuration/config/rules/**/*.gr` |
-| Gosu templates | `modules/configuration/gsrc/**/*.gst` |
-| Gosu programs | `modules/configuration/admin/bin/**/*.gsp` |
-| PCF files | `modules/configuration/config/web/pcf/**/*.pcf` |
-| Customer entity extensions | `modules/configuration/config/extensions/entity/**/*.eti` `modules/configuration/config/extensions/entity/**/*.etx` |
-| Base entity definitions | `modules/configuration/config/metadata/entity/**/*.eti` |
+| Gosu classes                 | `modules/configuration/gsrc/**/*.gs` |
+| Gosu enhancements            | `modules/configuration/gsrc/**/*.gsx` |
+| Gosu rules                   | `modules/configuration/config/rules/**/*.gr` |
+| Gosu templates               | `modules/configuration/gsrc/**/*.gst` |
+| Gosu programs                | `modules/configuration/admin/bin/**/*.gsp` |
+| PCF files                    | `modules/configuration/config/web/pcf/**/*.pcf` |
+| Customer entity extensions   | `modules/configuration/config/extensions/entity/**/*.eti` `modules/configuration/config/extensions/entity/**/*.etx` |
+| Base entity definitions      | `modules/configuration/config/metadata/entity/**/*.eti` |
 | Customer typelist extensions | `modules/configuration/config/extensions/typelist/**/*.ttx` |
-| Base typelist definitions | `modules/configuration/config/metadata/typelist/**/*.tti` |
-| Product model XML | `modules/configuration/config/resources/productmodel/**/*.xml` |
-| Display name files | `modules/configuration/config/displaynames/**/*.en` |
+| Base typelist definitions    | `modules/configuration/config/metadata/typelist/**/*.tti` |
+| Product model XML            | `modules/configuration/config/resources/productmodel/**/*.xml` |
+| Display name files           | `modules/configuration/config/displaynames/**/*.en` |
 
 ### Do Not Search
 
@@ -49,7 +49,7 @@ Only search the directories listed below. Do not search `bin/`, `plugins/`,
 ## Workflow
 
 Always-run phases execute for every target. Conditional phases run only when the stated
-condition is met.
+condition is met. **Phase A must always run first.**
 
 ---
 
@@ -84,15 +84,19 @@ Search scope:   config/extensions/entity/**/*.eti
 ```
 
 **What to look for:**
+
 - `impl="<pkg>.<TargetClass>"` in any `<implementsInterface>` element
 - `iface="cust.*"` or `iface="ext.*"` pointing to a customer-owned interface
 
 **Example commands:**
+
 ```bash
 grep -rn 'impl=".*<TargetClass>"' modules/configuration/config/extensions/entity/
 grep -rn 'impl="<fully.qualified.package>\.' modules/configuration/config/extensions/entity/
 grep -rn 'iface="cust\.' modules/configuration/config/extensions/entity/
+grep -rn 'iface="ext\.' modules/configuration/config/extensions/entity/
 grep -rn 'iface="cust\.' modules/configuration/config/metadata/entity/
+grep -rn 'iface="ext\.' modules/configuration/config/metadata/entity/
 ```
 
 ---
@@ -107,15 +111,18 @@ Find all files that import the target class via a `uses` statement.
 Search pattern: uses <fully.qualified.ClassName>
 Search scope:   modules/configuration/gsrc/**/*.gs
                modules/configuration/gsrc/**/*.gsx
+               modules/configuration/gsrc/**/*.gst
                modules/configuration/config/rules/**/*.gr
                modules/configuration/admin/bin/**/*.gsp
 ```
 
 **What to look for:**
+
 - `uses <pkg>.<TargetClass>` — direct import
 - `uses <pkg>.*` — wildcard import that covers the target (flag for manual review)
 
 **Example commands:**
+
 ```bash
 grep -rn 'uses <fully.qualified.package>\.<TargetClass>' modules/configuration/gsrc/
 grep -rn 'uses <fully.qualified.package>\.<TargetClass>' modules/configuration/config/rules/
@@ -134,9 +141,12 @@ Find all Gosu files that reference the target as a type.
 Search pattern: \b<ClassName>\b  (case-sensitive, word-boundary)
 Search scope:   modules/configuration/gsrc/**/*.gs
                modules/configuration/gsrc/**/*.gsx
+               modules/configuration/gsrc/**/*.gst
+               modules/configuration/admin/bin/**/*.gsp
 ```
 
 **What to look for:**
+
 - `var x : TargetClass` — variable declaration
 - `function foo(param : TargetClass)` — method parameter
 - `function bar() : TargetClass` — return type
@@ -148,8 +158,10 @@ Search scope:   modules/configuration/gsrc/**/*.gs
 - `<TargetEntity>Exists` — generated existence check on `PolicyPeriod` for LOB entity types
 
 **Example commands:**
+
 ```bash
 grep -rn '\b<TargetClass>\b' modules/configuration/gsrc/
+grep -rn '\b<TargetClass>\b' modules/configuration/admin/bin/
 grep -rn '\b<TargetEntity>Exists\b' modules/configuration/gsrc/
 grep -rn 'typeis.*<TargetEntity>' modules/configuration/gsrc/
 ```
@@ -175,26 +187,29 @@ Search scope:   modules/configuration/gsrc/**/*.gs
 ```
 
 **Steps:**
+
 1. Open the target `.gsx` and list every `function` and `property get`/`set` name.
 2. Grep each name individually across all scope directories above.
 3. Exclude the `.gsx` file itself — its own declaration is not a caller.
 
 **What to look for:**
+
 - `entity.<enhancedPropertyName>` — PCF or Gosu accessing an enhancement property
 - `variable.<enhancedMethodName>()` — Gosu calling an enhancement method
 - Any hit outside the owning file's directory
 
+**Note:** Enhancement dispatch is static — the declared type of the variable determines
+which enhancement fires, not the runtime type. Flag any caller where the variable is
+declared at a base type rather than the exact enhanced type.
+
 **Example commands:**
+
 ```bash
 grep -rn '\b<enhancedPropertyName>\b' modules/configuration/gsrc/
 grep -rn '\b<enhancedPropertyName>\b' modules/configuration/config/web/pcf/
 grep -rn '\b<enhancedPropertyName>\b' modules/configuration/config/rules/
 grep -rn '\b<enhancedMethodName>\b' modules/configuration/gsrc/
 ```
-
-**Note:** Enhancement dispatch is static — the declared type of the variable determines
-which enhancement fires, not the runtime type. Flag any caller where the variable is
-declared at a base type rather than the exact enhanced type.
 
 ---
 
@@ -211,10 +226,12 @@ Search scope:   modules/configuration/gsrc/**/*.gsx
 ```
 
 **What to look for:**
+
 - `enhancement MyEnhancement_Ext : entity.TargetEntity`
 - `enhancement MyEnhancement : pkg.TargetClass`
 
 **Example commands:**
+
 ```bash
 grep -rn 'enhancement.*:\s*entity\.<TargetEntity>' modules/configuration/gsrc/
 grep -rn 'enhancement.*:\s*<pkg>\.<TargetClass>' modules/configuration/gsrc/
@@ -236,11 +253,13 @@ Search scope:   modules/configuration/gsrc/**/*.gs
 ```
 
 **What to look for:**
+
 - `class MyImpl extends TargetBase`
 - `class MyImpl implements TargetInterface`
 - `delegate _impl : TargetInterface = new TargetImpl()`
 
 **Example commands:**
+
 ```bash
 grep -rn 'extends\s\+<TargetBaseClass>' modules/configuration/gsrc/
 grep -rn 'implements.*<TargetInterface>' modules/configuration/gsrc/
@@ -256,11 +275,12 @@ grep -rn 'delegate.*:\s*<TargetInterface>' modules/configuration/gsrc/
 Find PCF files that call the target class inside Gosu attribute expressions.
 
 ```
-Search pattern: <ClassName>
+Search pattern: TargetClass  (bare class name, not XML-escaped)
 Search scope:   modules/configuration/config/web/pcf/**/*.pcf
 ```
 
 **What to look for:**
+
 - `action="<pkg>.<TargetClass>.method(arg)"` — action attribute
 - `toRemove="...<TargetClass>.removeItem(entity)"` — toRemove attribute
 - `beforeSave="<TargetClass>.validate(period)"` — lifecycle hook
@@ -268,8 +288,9 @@ Search scope:   modules/configuration/config/web/pcf/**/*.pcf
 - `value="<TargetClass>.computeValue()"` — value expression
 
 **Example commands:**
+
 ```bash
-grep -rn '<TargetClass>' modules/configuration/config/web/pcf/
+grep -rn 'TargetClass' modules/configuration/config/web/pcf/
 grep -rn '<fully.qualified.package>\.' modules/configuration/config/web/pcf/
 ```
 
@@ -289,12 +310,14 @@ Search scope:   modules/configuration/config/resources/productmodel/**/*.xml
 ```
 
 **What to look for:**
+
 - `<InitializeScript>TargetClass.method(coverable)</InitializeScript>`
 - `<AvailabilityScript>TargetClass.isAvailable(line)</AvailabilityScript>`
 
 **Example commands:**
+
 ```bash
-grep -rn '<TargetClass>' modules/configuration/config/resources/productmodel/
+grep -rn 'TargetClass' modules/configuration/config/resources/productmodel/
 grep -rn 'InitializeScript\|AvailabilityScript' \
   modules/configuration/config/resources/productmodel/policylinepatterns/
 ```
@@ -315,9 +338,13 @@ Search pattern: "<LineName>"
                \.Code == "<TypecodeString>"
 Search scope:   modules/configuration/gsrc/**/*.gs
                modules/configuration/gsrc/**/*.gsx
+               modules/configuration/gsrc/**/*.gst
+               modules/configuration/config/rules/**/*.gr
+               modules/configuration/admin/bin/**/*.gsp
 ```
 
 **What to look for:**
+
 - `Set.of("<OtherLine>", "<TargetLineName>")` — set literal
 - `"<TargetLineName>" -> "<lobCode>"` — map entry
 - `.compare(Policy#ProductCode, Equals, "<TargetProductCode>")` — query filter
@@ -326,8 +353,10 @@ Search scope:   modules/configuration/gsrc/**/*.gs
 - `term.PatternCode == "<TargetCostLayerPatternCode>"` — cost layer pattern code
 
 **Example commands:**
+
 ```bash
 grep -rn '"<TargetLineName>"' modules/configuration/gsrc/
+grep -rn '"<TargetLineName>"' modules/configuration/config/rules/
 grep -rn '"<TargetProductCode>"' modules/configuration/gsrc/
 grep -rn 'PatternCode.*==.*"<TargetPatternPrefix>' modules/configuration/gsrc/
 grep -rn '\.Code\s*==\s*"' modules/configuration/gsrc/
@@ -348,13 +377,20 @@ Search scope:   modules/configuration/gsrc/**/*.gs
 ```
 
 **Steps:**
-1. Grep the shared constants class for constants whose value contains the target line name
-   or product code.
+
+1. Find which constants class defines the target value — grep `gsrc/` for the target line
+   name or product code as a string to locate the file that declares it as a named
+   constant.
 2. For each constant found, grep all callers by that constant's field name.
 3. List every caller as a file requiring a companion edit.
 
 **Example commands:**
+
 ```bash
+# Step 1 — locate the constants class
+grep -rn '"<TargetLineName>\|<TargetProductCode>"' modules/configuration/gsrc/
+
+# Step 2 — find all callers of the named constant
 grep -n '"<TargetLineName>\|<TargetProductCode>"' modules/configuration/gsrc/<path/to/SharedConstants>.gs
 grep -rn '<SharedConstantsClass>\.<TARGET_CONSTANT_NAME>' modules/configuration/gsrc/
 ```
@@ -375,10 +411,16 @@ Search scope:   modules/configuration/config/rules/**/*.gr
 ```
 
 **What to look for:**
+
 - `uses <pkg>.<TargetClass>` — import in rule body
-- Direct type references or method calls on the target class
+- `var x : TargetClass` — variable declaration
+- `typeis TargetClass` — type guard
+- `as TargetClass` — cast
+- `TargetClass.staticMethod()` — static call
+- Direct method calls on the target class
 
 **Example commands:**
+
 ```bash
 grep -rn 'uses <fully.qualified.package>\.' modules/configuration/config/rules/
 grep -rn '\b<TargetClass>\b' modules/configuration/config/rules/
@@ -397,9 +439,11 @@ Search pattern: <TemplateName>\.renderToString(
                <TemplateName>\.render(
 Search scope:   modules/configuration/gsrc/**/*.gs
                modules/configuration/gsrc/**/*.gsx
+               modules/configuration/gsrc/**/*.gst
 ```
 
 **Example commands:**
+
 ```bash
 grep -rn '\b<TargetTemplateName>\.renderToString(' modules/configuration/gsrc/
 grep -rn '\b<TargetTemplateName>\.render(' modules/configuration/gsrc/
@@ -409,20 +453,25 @@ grep -rn '\b<TargetTemplateName>\.render(' modules/configuration/gsrc/
 
 ### Phase F — Typelist Orphan Check
 
-**Run: When the target LOB owns typelists with no consumers outside its own files**
+**Run: When the target LOB owns typelists**
 
-Verify no consumers exist outside the LOB-owned directories.
+Verify no consumers exist outside the LOB-owned directories. If consumers are found, the
+typelist must be retained.
 
 ```
 Pattern:       typekey\.<TypelistName>\.TC_\w+
                \b<TypelistName>\b
 Search scope:  modules/configuration/gsrc/**  (outside lob-owned path)
+               modules/configuration/gsrc/**/*.gst
+               modules/configuration/config/rules/**/*.gr
                modules/configuration/config/web/pcf/**/*.pcf
 ```
 
 **Example commands:**
+
 ```bash
 grep -rn 'typekey\.<TargetTypelist>\.TC_' modules/configuration/gsrc/
+grep -rn 'typekey\.<TargetTypelist>\.TC_' modules/configuration/config/rules/
 grep -rn '\b<TargetTypelist>\b' modules/configuration/config/web/pcf/
 grep -rn '\b<TargetTypelist>\b' modules/configuration/gsrc/
 ```
@@ -442,6 +491,7 @@ Pattern:       filename starts with the target LOB prefix
 ```
 
 **Example commands:**
+
 ```bash
 ls modules/configuration/config/displaynames/<LOBPrefix>*.en
 ```
@@ -465,7 +515,7 @@ ls modules/configuration/config/displaynames/<LOBPrefix>*.en
 
 ### Phase 2 — Type References
 - <File.gs> line <N> — typeis TargetClass
-- <File.gs> line <N> — var x : TargetClass
+- <File.gst> line <N> — var x : TargetClass
 (or: No type references found)
 
 ### Phase B — Enhancement Method-Name Callers
@@ -526,15 +576,16 @@ ls modules/configuration/config/displaynames/<LOBPrefix>*.en
 
 ## Behavioral Rules
 
-1. **Always run Phases A, 1, 2, 5, and 6** for every target type.
+1. **Always run Phases A, 1, 2, 5, and 6 — in that order, Phase A first.** Phase A
+   catches silent runtime failures that no other phase covers.
 
-2. **Run Phase A first** — a missing `impl=` class causes server startup failure with no
-   compile error. Check both `config/extensions/entity/` and `config/metadata/entity/`.
-   Check `iface=` for any value outside `gw.*`, `com.guidewire.*`, and `java.*`.
+2. **Phase A: check both entity source trees and both namespaces** — search
+   `config/extensions/entity/` and `config/metadata/entity/`. Check `iface=` for any
+   value in `cust.*` or `ext.*` namespaces, not just `gw.*`.
 
 3. **Run Phase B when any `.gsx` is in scope** — callers never reference the enhancement
    class by name. Grep every method and property name individually across `.gs`, `.gsx`,
-   `.pcf`, `.gr`, and `.gst`.
+   `.gst`, `.pcf`, and `.gr`.
 
 4. **Phase 6 must always report its result** — "No `.gr` consumers found" is required
    output. Never omit it.
@@ -542,7 +593,7 @@ ls modules/configuration/config/displaynames/<LOBPrefix>*.en
 5. **Use case-sensitive, word-boundary search** — Gosu class names are PascalCase.
    `\bClassName\b` prevents false positives (e.g., `Claim` matching `ClaimContact`).
 
-6. **Check both `gsrc/` and `config/rules/`** — Phase 1 and 2 cover `gsrc/`; Phase 6
+6. **Check both `gsrc/` and `config/rules/`** — Phases 1 and 2 cover `gsrc/`; Phase 6
    covers `config/rules/` separately.
 
 7. **Do not search `bin/`, `plugins/`, or `configuration_backup/`** — not source.
