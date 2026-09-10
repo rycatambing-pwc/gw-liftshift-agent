@@ -47,3 +47,31 @@ If multiple fields test the **same** condition independently (e.g. each has `vis
 PCF variable scope follows a 4-level lookup: (1) local variable in current scope, (2) iterator element in a `RowIterator`, (3) page-level `Variable` declarations, (4) the PCF root object. Inside a `RowIterator`, the row element is accessed by `elementName`, not through the parent root. Referencing the wrong scope produces silent wrong-value bugs, not compilation errors.
 
 Full details: `/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`.
+
+## Rule: Avoid Expensive Logic in `PostOnChange` Handlers
+
+`PostOnChange` fires on **every field change** and triggers a synchronous server round-trip that blocks the user until the response returns. Do not put database queries, rule evaluations, or other expensive operations directly in a `PostOnChange` handler. Hoist expensive values into PCF `<Variable>` elements, or use a dedicated service method that caches results.
+
+## Rule: Do Not Conflate PCF `validationExpression` with `.gr` Validation Rules
+
+These two mechanisms run in different contexts and have different scopes:
+
+| Mechanism | When it fires | Scope |
+|---|---|---|
+| PCF `validationExpression` | On screen save, after user interaction | UI only — never called from APIs or batch |
+| `.gr` validation rules | On commit, at the domain layer | Applies to all entry points (UI, API, batch) |
+
+Using only `validationExpression` leaves the API layer unprotected. Business-critical validation that must hold regardless of entry point belongs in a `.gr` validation rule. PCF `validationExpression` is for user-facing messaging on top of that.
+
+## Rule: Preupdate Rules Do Not Re-Trigger on Objects Modified During the Same Execution Cycle
+
+A preupdate rule that modifies entity B while processing entity A will **not** cause another preupdate rule run for entity B in the same cycle. The platform processes each object's preupdate rules once per cycle. Do not design rule logic that depends on cascading preupdate re-entry — it will silently not fire.
+
+## Rule: Verify the `Validatable` Delegate Before Writing Validation Rules
+
+Before writing a validation rule for an entity, confirm the entity's `.eti` or `.etx` declares the `Validatable` delegate. Without this delegate, the validation framework does not fire for that entity regardless of how the rule is written.
+
+```xml
+<!-- Required in the entity's .eti or .etx -->
+<delegate name="Validatable" type="Validatable"/>
+```
