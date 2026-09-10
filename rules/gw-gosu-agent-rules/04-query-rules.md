@@ -68,6 +68,23 @@ Full mechanics: `/context/gosu/queries/30-db-connection-pool.md`.
 
 `contains()` on a DB-backed collection performs a case-sensitive in-memory check, not a database LIKE query. For database-level substring search, use the appropriate `compareIgnoreCase` or `startsWith`/`contains` query comparison method, not the Gosu collection operator.
 
+## Rule: `contains()` Must Be Preceded by Indexed Predicates
+
+A `contains()` (substring) comparison in a query performs a full-table scan unless the query already has other predicates that narrow the result set using indexed columns. Never issue a `contains()` as the only predicate — always add at least one indexed equality or range predicate first to limit the scan surface.
+
+```gosu
+// WRONG — full-table substring scan
+var q = Query.make(Policy)
+q.contains("PolicyNumber", "ABC", false)
+var results = q.select()
+
+// CORRECT — narrow with an indexed predicate first
+var q = Query.make(Policy)
+q.compare("Status", Equals, PolicyStatus.TC_OPEN)   // indexed
+q.contains("PolicyNumber", "ABC", false)             // then substring
+var results = q.select()
+```
+
 ## Rule: Avoid Collection Counting on DB-Backed Arrays
 
 Calling `.Count` directly on an entity's array relationship (e.g. `claim.Exposures.Count`) triggers a full fetch of the related collection. Use a query with `getCountLimitedBy()` or `.Empty` instead.

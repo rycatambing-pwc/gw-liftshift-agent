@@ -24,6 +24,61 @@ Guidewire provides automatic bundle management for web requests, rule executions
 
 **Do not** call `bundle.commit()` explicitly unless you are in a context that genuinely has no automatic bundle lifecycle (e.g. a standalone CLI program or a tightly controlled batch operation). Explicit commits in automatic contexts double-commit and can cause integrity errors.
 
+When you do need a manual bundle, prefer `gw.transaction.Transaction.runWithNewBundle` over a raw `bundle.commit()` — it auto-commits on success and auto-rolls back on any exception, eliminating the need for manual try/finally cleanup.
+
+```gosu
+// PREFER
+gw.transaction.Transaction.runWithNewBundle(\ bundle -> {
+  var enrolled = bundle.add(myEntity)
+  enrolled.SomeField = "value"
+})
+
+// AVOID — requires manual commit and error handling
+var bundle = gw.transaction.Transaction.newBundle()
+try {
+  var enrolled = bundle.add(myEntity)
+  enrolled.SomeField = "value"
+  bundle.commit()
+} catch (e) {
+  bundle.rollback()
+  throw e
+}
+```
+
+## Rule: Mutate Only the Bundle-Tracked Copy
+
+After enrolling an entity via `bundle.add()`, all mutations must be made on the returned enrolled copy — not on the original reference, which may be a read-only query result. Working on the original produces silent data loss or a `ReadOnlyEntityException`.
+
+## Rule: Page Large Result Sets in Bundle Operations
+
+Do not accumulate an unbounded number of entities in a single bundle. Large bundles cause memory pressure and extended lock hold times. When processing large collections, page the results and use a separate bundle per batch.
+
+```gosu
+// WRONG — accumulates all records in one bundle
+gw.transaction.Transaction.runWithNewBundle(\ bundle -> {
+  Query.make(Policy).select().each(\ p -> {
+    bundle.add(p).SomeField = "updated"
+  })
+})
+
+// CORRECT — process in pages with a fresh bundle per batch
+var pageSize = 500
+var offset = 0
+var hasMore = true
+while (hasMore) {
+  var page = Query.make(Policy).select().toTypedArray().subArray(offset, offset + pageSize)
+  hasMore = page.length == pageSize
+  offset += pageSize
+  gw.transaction.Transaction.runWithNewBundle(\ bundle -> {
+    page.each(\ p -> { bundle.add(p).SomeField = "updated" })
+  })
+}
+```
+
+## Rule: Never Nest `executeTransactionsWithReservedConnection` Blocks
+
+`ConnectionUtil.executeTransactionsWithReservedConnection` must not be nested. The inner block does not receive a new reserved connection — the behavior is undefined and can cause connection state corruption or deadlocks.
+
 ## Rule: Use `entity.remove()` — Not `delete`
 
 To delete a persistent entity, call `entity.remove()`. The `delete` keyword removes the local variable reference but does **not** mark the entity for deletion in the database.

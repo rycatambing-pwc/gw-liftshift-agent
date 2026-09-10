@@ -2,6 +2,30 @@
 
 These are firm conventions, not suggestions — violating them creates namespace collisions with Guidewire base code and breaks upgrade-merge hygiene.
 
+## Where Customer Code Lives — Correct Locations by Artifact Type
+
+Use this table to determine where to place customer additions. Never write into platform-owned locations.
+
+| What you are adding | Correct location |
+|---|---|
+| New fields on an existing Guidewire entity | `.etx` file for that entity |
+| New typecodes on an existing typelist | `.ttx` file for that typelist |
+| Methods and computed properties on an entity type | `.gsx` enhancement file in `extensions/entity/` |
+| All new implementation classes (services, helpers, utilities) | Customer package space (e.g. `cust.*`, `ext.*`), sub-packaged by feature |
+| GUnit test classes | `modules/configuration/gtest/` |
+| Customer additions to any base Guidewire artifact | Must carry the `_Ext` suffix (fields, PCF files, PCF elements, display keys, script parameters, enhancement methods) |
+
+**Platform-owned locations — never write here:**
+
+| Location / file type | Why it is off-limits |
+|---|---|
+| `.eti` files | Base entity definitions — platform-owned, overwritten on upgrade |
+| `.eix` files | Internal entity extensions — platform-owned |
+| `.tti` files | Base typelist definitions — platform-owned |
+| `.tix` files | Platform typelist extensions — platform-owned |
+| `gw.*` / `com.guidewire.*` packages | Guidewire-reserved namespaces — causes upgrade conflicts |
+| Runtime-generated entity `.gs` classes | Auto-generated from metadata — hand edits are overwritten on build |
+
 ## Customer Package Placement
 
 - All customer Gosu code must live in **customer-owned packages** (e.g. `com.mycompany.*`, `ext.*`).
