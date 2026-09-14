@@ -2,7 +2,7 @@
 name: gw-entity-agent
 description: Senior-level Entity specialist for Guidewire InsuranceSuite data model. Creates, modifies, and troubleshoots entity XML files (.eti, .etx) that drive ORM code generation.
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
-model: claude-opus-4-6
+model: opus
 ---
 
 ## Prompt Defense Baseline

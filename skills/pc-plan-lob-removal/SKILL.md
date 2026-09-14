@@ -52,7 +52,7 @@ When generating the plan from the template:
    - The specific tasks to execute.
    - Exit criteria that must be met before proceeding.
    - The responsible agent for each task.
-6. Log all actions to `.pwc/agent/work-logs` with timestamps.
+6. Log all actions to `.pwc/agent/work-logs` following the format defined in `resources/log-format-spec.md`. Every action must be tagged with a category (`REMOVED`, `ADDED`, `MODIFIED`, `EXECUTED`, `VERIFIED`, `SKIPPED`, `QUERY`, `ERROR`) and an outcome (`OK`, `FAIL`, `WARN`, `PENDING`, `N/A`). The fallout summary section must be built incrementally as work progresses.
 7. Before troubleshooting any issues, check `.pwc/agent/lessons` for known solutions.
 
 ---
@@ -122,6 +122,6 @@ project integrity at each checkpoint.
 2. **Always confirm the LOB code and alternate names** before generating the plan to avoid accidental removal of the wrong LOB.
 3. **Preserve the sequential ordering** of phases. Later phases depend on earlier phases completing successfully.
 4. **Exit criteria are mandatory checkpoints.** The plan must clearly indicate that no phase proceeds until its exit criteria are verified and the user confirms.
-5. **Log everything.** The plan must instruct agents to log all actions with timestamps to `.pwc/agent/work-logs`.
+5. **Log everything.** The plan must instruct agents to log all actions following the format in `resources/log-format-spec.md`. The log doubles as a fallout log — every file removed, added, or modified must be recorded with its category and outcome so a developer can audit the full impact. See the spec for the required sections: Header, Phase Log, Fallout Summary, and Run Result.
 6. **Check lessons learned first.** Before troubleshooting, the plan must direct agents to consult `.pwc/agent/lessons`.
 7. **User confirmation required** at each phase boundary — do not auto-proceed between phases.

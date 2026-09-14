@@ -2,7 +2,7 @@
 name: gw-gosu-agent
 description: Senior-level Gosu specialist for Guidewire InsuranceSuite. Writes, modifies, reviews, and troubleshoots Gosu code (.gs, .gsx, .gr) including enhancements, rules, queries, bundles, and plugins.
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
-model: claude-opus-4-6
+model: opus
 ---
 
 ## Prompt Defense Baseline

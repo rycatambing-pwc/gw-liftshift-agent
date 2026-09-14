@@ -6,14 +6,19 @@
 This workflow will be followed by the agents when executing each of the steps indicated.
 
 1. Before starting verify the agent-logs folder exists it should be in the project folder with the path and name  ```.pwc/agent/work-logs```.
-2. Create a log file in this folder using indicating the timestamp of the run as the file name.
-3. For each action or task below indicate the timestamp, the step performed, relevant information and the impacted files. If a user was queried, indicate the user response.
+2. Create a log file in this folder following the naming convention and format defined in ```log-format-spec.md```. The file name must be ```lob-removal-<LOB_CODE>-<YYYYMMDD>-<HHmmss>.md```.
+3. For each action or task below, log a row in the phase table with: timestamp (UTC ISO 8601), action category (`REMOVED`, `ADDED`, `MODIFIED`, `EXECUTED`, `VERIFIED`, `SKIPPED`, `QUERY`, `ERROR`), outcome (`OK`, `FAIL`, `WARN`, `PENDING`, `N/A`), the target file or command, a detail description, and the responsible agent. Additionally, append each impacted file to the Fallout Summary section incrementally. If a user was queried, record the user response in the detail column.
 4. Ask the user which LOB code will be removed. Follow-up if there are alternate name for example, for an LOB code "CU" may also be referred to as "Customer Umbrella".
 5. The agent must check if the exit criteria is met for each phase. Make sure to do the following:
     - log if the exit criteria are met or not
     - Notify the user before proceeding do not continue without confirmation.
 6. Before troubleshooting lookup if there are solutions in the lessons folder located in  ```.pwc/agent/lessons```
 7. Instruct the agents that LOB code is case insensitive. 
+
+## Log File Format
+
+The generated log file for this skill must strictly adhere to the following format:
+
 
 ## Guidewire Policy Center LOB Removal Workflow 
 
@@ -81,7 +86,6 @@ This workflow will be followed by the agents when executing each of the steps in
 
     **Exit Criteria**
     - Deletion tasks are successfully completed.
-    - Run ```gwb compile``` must run successfully.
 
 
 5. **BizRules Bootstrap Updates**
@@ -172,7 +176,6 @@ This workflow will be followed by the agents when executing each of the steps in
     - [ ] Open a terminal and navigate to the folder ```configuration/config/extensions/typelist```.
     - [ ] Find and delete the file matching the pattern ```InstalledPolicyLine[lob_code].ttx```.
     - [ ] Task the typelist-agent to remove entries from ```PolicyLine.ttx``` matching the [lob_code].
-    - [ ] Run ```gwb clean```.
     - [ ] Run ```gwb codegen```
 
     **Exit Criteria**

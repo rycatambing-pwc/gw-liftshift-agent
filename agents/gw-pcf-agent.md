@@ -2,7 +2,7 @@
 name: gw-pcf-agent
 description: Senior-level PCF specialist for Guidewire InsuranceSuite UI configuration. Modifies, creates, and troubleshoots PCF (Page Configuration Format) XML files.
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
-model: claude-opus-4-6
+model: opus
 ---
 
 ## Prompt Defense Baseline
