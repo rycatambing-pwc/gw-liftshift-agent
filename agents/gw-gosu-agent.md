@@ -443,3 +443,51 @@ Which transaction strategy should this method use?
 6. **Explain impact.** When a Gosu change requires companion changes (entity files, typelists, PCFs, display keys), call them out explicitly and delegate to the responsible agent.
 7. **Flag performance risks.** If proposed or existing code exhibits known anti-patterns (N+1 queries, in-memory filtering, unbounded bundles), flag them proactively.
 8. **Respect the framework.** Work within the Guidewire framework patterns (rules, plugins, enhancements, Query API) rather than bypassing them with raw Java or reflection.
+
+---
+
+## LOB Removal Protocol
+
+When participating in LOB removal (invoked by `gw-planner` via the `pc-plan-lob-removal` skill), follow these rules. They exist because past LOB removals produced 50+ errors the user had to find manually. Before troubleshooting, check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md`.
+
+### Consumer-First Deletion (NON-NEGOTIABLE)
+Before removing ANY constant, typecode reference, import, or type usage from a Gosu file:
+1. Grep the ENTIRE codebase for that symbol (gsrc/, config/, gtest/, integration/)
+2. List all consumers found
+3. Remove all consumers FIRST
+4. THEN remove the definition
+5. Grep again to verify zero references remain
+
+This rule was violated on EVERY LOB removal. Constants were deleted from `CommonConstants_Ext.gs` while `EntityMetadataUtil.gs`, `AccountHelper_Ext.gs`, `CovTermEnhancementDgc.gsx`, and `SubmissionWizard_PolicyInfoDV.pcf` still referenced them.
+
+### Verify Syntax After Every Edit
+When removing an if-guard, case branch, or constant reference:
+- Verify surrounding syntax is valid — check for orphaned braces `{` `}`, dangling else, empty blocks
+- Read the file after editing to confirm it parses
+- `SpecialCasesClauseLoadGenerator.gs` had orphaned braces after WCM if-guard was removed
+
+### Never Rename Dead References — Remove Them
+When a display key or constant reference points to a removed LOB, REMOVE the reference entirely. Never rename to a different key. Renaming to nonexistent keys caused compile errors in CA7 (`PolicyContactRolePanelSet.PolicyAddlInsured.pcf`) and GL7 (`PolicyPeriodValidation_Ext.gs`).
+
+### Fragile File: UnderwriterEvaluatorTriggeringPoint_Ext.gs
+Broken 3 times (WCM, CU, BP7). Aggregates typecodes in one `addAll` block. One bad typecode cascades `ErrorType` to entire array.
+1. Read fresh before EVERY LOB removal pass
+2. After editing, verify EVERY remaining typecode exists in `RuleContextDefinitionKey.ttx`
+3. Do NOT trust prior LOB passes left it correct
+
+### Gosu Templates (.gst) Are Runtime Crash Risks
+`.gst` files reference entity properties at render time — no compile errors, crash at RUNTIME. `VeriskPrometrixDocument_Ext.gst` had 147 lines of dead Crime section.
+**Always grep `.gst` files** when removing entity properties or LOB model fields.
+
+### Start-Boundary Grep Only
+Use `\bWCM` NOT `\bWCM\b`. End boundary misses compound identifiers like `WCMLocation`, `WCMLargeDeductible`.
+
+### Search Scope for LOB Removal
+- `gsrc/**/*.gs`, `gsrc/**/*.gsx`, `gsrc/**/*.gst`
+- `gtest/**/*.gs`, `gtest/**/*.gsx`
+- `config/rules/**/*.gr`
+- `config/web/pcf/**/*.pcf`
+- `**/mock/**`, `**/sample*/**`
+
+### Sequential Execution Only
+NEVER run in parallel with another agent deleting definitions. Reference updates complete fully before definition deletions start.

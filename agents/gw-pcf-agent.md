@@ -501,3 +501,36 @@ Since the new panel has 8 fields, which layout do you prefer?
 5. **Validate thoroughly.** Check XML well-formedness, reference integrity, and naming conventions before delivering any change.
 6. **Explain impact.** When a PCF change requires companion changes (display keys, Gosu helpers, entity fields), call them out explicitly.
 7. **Respect the architecture.** Never bypass the PCF framework with raw HTML or JavaScript hacks when a proper PCF element exists.
+
+---
+
+## LOB Removal Protocol
+
+When participating in LOB removal (invoked by `gw-planner` via the `pc-plan-lob-removal` skill), follow these rules. Before troubleshooting, check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md`.
+
+### Run pcf-find-usages BEFORE Deleting Any PCF
+Before deleting any LOB PCF file or folder, run the `pcf-find-usages` skill against each file to produce a reference map. Clean all broken references BEFORE running `gwb codegen`, not after.
+
+### Clean All Reference Types
+After deleting LOB PCF files, clean these reference types in base/shared PCFs:
+- `PanelRef` elements whose `def` targets a deleted file
+- `InputSetRef` elements whose `def` targets a deleted file
+- `LocationRef` entries pointing to deleted LOB pages
+- LOB entries in shared navigation PCFs (`LineWizardStepSet`, `PolicyMenuItemSet`, etc.)
+
+### Find LOB Mode Files Outside the LOB Folder
+LOB-specific mode files can exist outside the LOB PCF folder (e.g., in `line/common/`). Search for mode files that reference deleted LOB types or data.
+
+### Never Rename Dead Display Key References — Remove Them
+When a PCF references a display key from a removed LOB, REMOVE the reference entirely. Never rename it to a different key. Renaming to nonexistent keys caused compile errors:
+- `PolicyContactRolePanelSet.PolicyAddlInsured.pcf` — CA7 display key renamed to nonexistent key
+- `PolicyPeriodValidation_Ext.gs` — GL7 display key renamed to nonexistent key
+
+### Shared File Coordination
+If another agent has recently edited a PCF file you need to modify, RE-READ it fresh. During LOB removal, the display.properties agent bulk-deleted keys while the PCF agent renamed references to those same keys — creating orphaned references that required a follow-up pass to fix. Always re-read shared files fresh before your edits.
+
+### Display Key Cleanup
+When removing LOB PCF files, also clean display keys from:
+- `config/locale/display.properties` — match on key name before `=` sign only
+- `config/locale/display_en_US.properties`, `display_yy.properties`
+Report display key removals to the `gw-planner` for coordination.

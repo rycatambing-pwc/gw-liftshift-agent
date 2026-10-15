@@ -198,6 +198,8 @@ Search in:
 ```
 configuration/config/rules/
 configuration/config/import/bizrules/
+configuration/config/bizrules/
+configuration/config/gwrules/
 ```
 
 Find references to typecodes from this typelist in business rules.
@@ -225,6 +227,75 @@ configuration/gtest/
 Find test files referencing the typelist or its typecodes.
 
 **Removal action**: Delete test files that exist solely to test functionality of the removed typelist. For shared test files, remove only the relevant test methods/assertions.
+
+#### 4k. Locale Variant Properties Files (CRITICAL — frequently missed)
+
+These files were missed in past LOB removals, leaving thousands of orphaned keys:
+
+Search in:
+```
+configuration/config/locale/typelist.properties
+configuration/config/locale/typelist_en_US.properties
+configuration/config/locale/typelist_yy.properties
+configuration/config/locale/typelist_es.properties
+configuration/config/locale/typelist_es_ES.properties
+configuration/config/locale/productmodel.display.properties
+configuration/config/locale/schema.display.properties
+configuration/config/locale/schema.display_en_US_EDG.properties
+configuration/config/locale/schema.display_en_US_EDG_PH.properties
+configuration/config/locale/display_en_US.properties
+configuration/config/locale/display_yy.properties
+```
+
+**Removal action**: Remove matching keys from ALL variant files, not just the main `display.properties`.
+
+#### 4l. Smoketests (ALWAYS missed)
+
+Search in:
+```
+configuration/config/smoketests/typelists.properties
+configuration/config/smoketests/
+```
+
+This directory was missed in every past LOB removal. CPP had entries here no agent found.
+
+**Removal action**: Remove matching entries from smoketest properties.
+
+#### 4m. REST API Schemas
+
+Search in:
+```
+configuration/integration/**/*.schema.json
+configuration/config/integration/**
+```
+
+`CUPolicyType` and `coverageNameCU_Ext` were both missed in `policyperiod_ext-1.0.schema.json`.
+
+**Removal action**: Remove typelist type references from schema files.
+
+#### 4n. Gosu Templates (.gst)
+
+Search in:
+```
+configuration/gsrc/**/*.gst
+```
+
+Templates reference typelist values at render time — no compile errors, RUNTIME crash.
+
+**Removal action**: Remove typelist references from templates. Flag the template file for full review if the LOB section is large.
+
+#### 4o. Config XML and State Sets
+
+Search in:
+```
+configuration/config/xml/config.xml
+configuration/config/statesets/StateSets.xml
+configuration/config/resources/ResourceContextMap.xml
+```
+
+LOB-specific parameters and resource context typecodes were missed here.
+
+**Removal action**: Remove LOB-specific entries.
 
 ### Step 5 — Execute Removal (or Report Dry-Run)
 

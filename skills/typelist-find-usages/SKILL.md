@@ -176,9 +176,80 @@ Look for `<typelist name="<TypelistName>">` entries in `typecodemapping.xml`.
 Search in:
 ```
 configuration/config/import/bizrules/
+configuration/config/bizrules/
+configuration/config/gwrules/
 ```
 
 Look for references to typecodes from this typelist.
+
+#### 4h. Locale Variant Properties Files (CRITICAL — frequently missed during LOB removal)
+
+These files were missed in past LOB removals, leaving thousands of orphaned keys:
+
+Search in:
+```
+configuration/config/locale/typelist.properties
+configuration/config/locale/typelist_en_US.properties
+configuration/config/locale/typelist_yy.properties
+configuration/config/locale/typelist_es.properties
+configuration/config/locale/typelist_es_ES.properties
+configuration/config/locale/productmodel.display.properties
+configuration/config/locale/schema.display.properties
+configuration/config/locale/schema.display_en_US_EDG.properties
+configuration/config/locale/schema.display_en_US_EDG_PH.properties
+configuration/config/locale/display_en_US.properties
+configuration/config/locale/display_yy.properties
+```
+
+Look for keys containing the typelist name or its typecodes.
+
+#### 4i. Smoketests (frequently missed)
+
+Search in:
+```
+configuration/config/smoketests/typelists.properties
+configuration/config/smoketests/
+```
+
+This directory is NOT in typical search paths and was missed in every past LOB removal.
+
+#### 4j. REST API Schemas
+
+Search in:
+```
+configuration/integration/**/*.schema.json
+configuration/config/integration/**
+```
+
+Look for references to the typelist name. `CUPolicyType` was missed in `policyperiod_ext-1.0.schema.json` during CU removal.
+
+#### 4k. Gosu Templates (.gst)
+
+Search in:
+```
+configuration/gsrc/**/*.gst
+```
+
+Templates reference typelist values at render time. They do NOT cause compile errors but CRASH at runtime.
+
+#### 4l. Config XML
+
+Search in:
+```
+configuration/config/xml/config.xml
+```
+
+Look for LOB-specific parameters referencing this typelist.
+
+#### 4m. Tests
+
+Search in:
+```
+configuration/gtest/**/*.gs
+configuration/gtest/**/*.gsx
+```
+
+Look for test files referencing the typelist or its typecodes.
 
 ### Step 5 — Save Results (Conditional)
 

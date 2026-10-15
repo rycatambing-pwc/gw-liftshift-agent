@@ -418,3 +418,38 @@ The primary application module:
 8. **For incremental build issues, toggle incremental/cacheable flags** in `gradle.properties` before resorting to full clean.
 9. **Use `--info` or `--debug` flags** with `gwb` for verbose output when diagnosing failures.
 10. **Check `extension_libs/` directory** when classpath or linkage errors occur — custom JARs go there.
+
+---
+
+## LOB Removal Protocol
+
+When participating in LOB removal (invoked by `gw-planner` via the `pc-plan-lob-removal` skill), follow these rules. Before troubleshooting, check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md`.
+
+### H2 Database Deletion After Entity/Systable Changes
+Delete `tmp/pc.mv.db` and `tmp/pc.lock.db` after ANY entity, typelist, or systable deletion. Stale H2 cache caused 3 startup failures during LOB removal. H2 caches entity schemas and systable checksums — deleted files still referenced by cached state.
+
+### Server Startup Error Classification
+When the server fails to start after LOB removal, classify the error:
+
+| Error Pattern | Root Cause | Fix |
+|---|---|---|
+| `FileNotFoundException` for systable XML | Deleted systable file but registration left in `systables.xml` or `systables.CUST.xml` | Remove registration from ALL `systables*.xml` files |
+| `ClassNotFoundException` for rule class | Deleted `.gr` rule file but entry left in parent `order.txt` | Remove entry from `order.txt` |
+| `Invalid typelist` in API schema | LOB type reference left in `*.schema.json` | Clean REST API schema files |
+| `BizRules import failure` for LOB line | Pre-existing gwrules bootstrap references removed LOB | Check `config/bizrules/` and `config/gwrules/` |
+| H2 checksum/schema errors | Stale H2 database | Delete `tmp/pc.mv.db` and `tmp/pc.lock.db` |
+| `ProductModelImportException` | Systable data referencing missing entries | Fix systable references or restore OOTB version |
+
+### Stale WSDL Cache Cleanup
+After modifying and restoring WSDL/XSD files, `idea-gclasses` cache may retain old compiled classes. Delete `plugins/Gosu/idea-gclasses/wsi/` directory if you see stale class errors.
+
+### Build Sequence for LOB Removal
+After LOB entity/typelist changes, always run in this order:
+1. Delete H2 database
+2. `gwb clean`
+3. `gwb codegen` — must succeed before attempting compile
+4. `gwb compile` — must succeed before attempting server start
+5. `gwb runServer` — must reach MULTIUSER run level
+
+### Post-Fix Verification
+After fixing any startup or compile error, run a final grep sweep for LOB references. Fixes can introduce new orphaned references.

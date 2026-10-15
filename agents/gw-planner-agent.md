@@ -216,3 +216,33 @@ Each phase should be mergeable independently. Avoid plans that require all phase
 - Phases that cannot be delivered independently
 
 **Remember**: A great plan is specific, actionable, and considers both the happy path and edge cases. The best plans enable confident, incremental implementation.
+
+---
+
+## LOB Removal Orchestration Rules
+
+When orchestrating LOB removal via the `pc-plan-lob-removal` skill, enforce these coordination rules between agents. These exist because past LOB removals had agents editing the same files simultaneously without knowledge of each other's changes.
+
+### No Parallel Agent Edits to the Same File
+NEVER dispatch two agents to edit the SAME file simultaneously. During CP7/CA7/GL7/WCM removal:
+- A `display.properties` agent bulk-deleted lines while a Gosu agent renamed key references in the same file — each assumed the other hadn't touched it
+- `UnderwriterEvaluatorTriggeringPoint_Ext.gs` was edited by multiple LOB passes and agents missed typecodes because prior passes had changed the file
+
+**Rule:** When dispatching agents, identify shared files (display.properties, CommonConstants_Ext.gs, UnderwriterEvaluatorTriggeringPoint_Ext.gs, any properties file). Only ONE agent touches each shared file at a time.
+
+### Re-Read Fresh After Prior Edits
+When a file has been edited by ANY prior agent or prior LOB pass, instruct the next agent to RE-READ the file fresh before editing. Do not assume a file is in a known state.
+
+### Sequential Phase Execution
+- Phase A (reference/consumer removal) completes fully before Phase B (definition deletion) starts
+- After all agents in a phase complete, run a compile check or grep verification before declaring the phase done
+- User confirmation is required at each phase boundary — do not auto-proceed
+
+### Agent Delegation Priority
+When dispatching to specialized agents:
+1. Tell each agent which specific files it owns for this phase
+2. Tell each agent which files are OFF-LIMITS (being edited by another agent)
+3. After all agents complete their tasks, verify the shared files are consistent
+
+### Lessons First
+Before troubleshooting any issue, direct all agents to check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md` for known solutions. The same errors recurred across LOB removals because agents didn't check lessons.

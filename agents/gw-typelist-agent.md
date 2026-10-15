@@ -131,3 +131,43 @@ State exactly what was created or changed — file name, root element type, and 
 - DO NOT add `priority` to a typecode in a `.ttx` if the existing codes in that file use no priority — keep the style consistent
 - ALWAYS preserve the `<?xml version="1.0"?>` declaration at the top of every file
 - ALWAYS use the namespace `xmlns="http://guidewire.com/typelists"` on the root element
+
+---
+
+## LOB Removal Protocol
+
+When participating in LOB removal (invoked by `gw-planner` via the `pc-plan-lob-removal` skill), follow these rules. Before troubleshooting, check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md`.
+
+### Run typelist-find-usages Before Deleting Any Typelist
+Before deleting ANY `.tti` or `.ttx` file or removing typecodes, run `typelist-find-usages` to find all consumers. Remove all consumers first, then delete the typelist/typecodes.
+
+### Check ALL .ttx Files for LOB Typecodes
+Don't just search for LOB-prefixed typelist FILES. Search INSIDE all `.ttx` files for typecodes mentioning the LOB:
+- `PropFacCoverageBucket_Ext.tti` had a "Commercial Property" typecode for CP7
+- `ResourceContext.ttx` had "Guidewire WC" for WCM
+These were found by the user, not the agent.
+
+### Check ALL Locale Variant Properties Files
+Typelist display keys appear in MANY properties files. ALL of these must be swept:
+- `config/locale/typelist.properties` — CU had 10 keys + 34 rule context keys + `APDCloudProduct`/`InstalledPolicyLine` entries
+- `config/locale/typelist_en_US.properties` — `LOBName_UM.CommercialProperty` + `WorkersComp` were here
+- `config/locale/typelist_yy.properties` — same entries
+- `config/locale/typelist_es.properties` — `ClassCodeType.CR` Spanish translation
+- `config/locale/typelist_es_ES.properties` — Spain translation
+- `config/locale/productmodel.display.properties` — BP7 had 1,310 keys, GL7 had 839 keys
+- `config/smoketests/typelists.properties` — THIS FILE IS ALWAYS MISSED. CPP had entries here.
+
+### False Positive Handling for Short LOB Prefixes
+Short LOB codes match unrelated identifiers. Filter carefully:
+| LOB | False Positives | Use Instead |
+|-----|----------------|-------------|
+| CP/CPP | `CPPolicy`, `CPClassCode` | Verify LOB code vs platform CP |
+| CU | `CUSTOM`, `CURRENT`, `CURSOR` | `\bCU[^a-z]` or specific identifiers |
+| GL | `GLOBAL` | `GL7` or `\bGL7` |
+| CR | `CREATE`, `CREDENTIAL` | `CR7` or `CRLine` |
+
+### Start-Boundary Grep Only
+Use `\bWCM` NOT `\bWCM\b`. End boundary misses compound identifiers.
+
+### Shared File Coordination
+If another agent has recently edited a typelist file or properties file you need to modify, RE-READ it fresh before editing. During LOB removal, the display.properties agent bulk-deleted keys while the Gosu agent renamed references to those keys — creating orphaned references. When a file has been edited by a prior pass, always re-read it fresh before your edits.

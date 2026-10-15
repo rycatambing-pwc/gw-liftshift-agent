@@ -453,3 +453,45 @@ Which type should this entity use?
 6. **Explain impact.** When an entity change requires companion actions (version increment, codegen, Gosu updates, PCF updates, version triggers), call them out explicitly.
 7. **Respect the data model architecture.** Never bypass the ORM framework with direct SQL or manual table manipulation. All schema changes flow through entity XML files.
 8. **Consider existing data.** Always assess whether existing rows in the database will be affected by the change and whether a version trigger is needed.
+
+---
+
+## LOB Removal Protocol
+
+When participating in LOB removal (invoked by `gw-planner` via the `pc-plan-lob-removal` skill), follow these rules. Before troubleshooting, check `.pwc/agent/lessons` and `resources/lob-removal-lessons.md`.
+
+### Run entity-find-usages Before Deleting Any Entity
+Before deleting ANY `.eti` or `.etx` file, run the `entity-find-usages` skill to find all consumers. Remove all consumers first, then delete the entity.
+
+### Systable Registration Cleanup (CRITICAL)
+When deleting systable data files, ALWAYS remove their registrations from:
+- `config/resources/systables.xml`
+- `config/resources/systables.CUST.xml` — this file was UNKNOWN to agents during CU removal, causing `FileNotFoundException` for `employment_practices_liability_excluded_class_ext.xml`
+- ANY `systables.*.xml` variant (e.g., `systables.BP7.xml`)
+
+Failure: `wc_decile_dividend_map.xml` was deleted but registration left in `systables.xml` → `FileNotFoundException` at startup.
+
+### Rule order.txt Cleanup
+When deleting `.gr` rule files, ALWAYS remove their entry from the parent directory's `order.txt`. `DividendComp_Ext` ClassNotFoundException was caused by a leftover order.txt entry.
+
+### Event Rule Cleanup
+Check entity `.etx` files for event rule entries that reference LOB-specific code. EPLI events in `PolicyPeriod.etx` were missed during CU removal.
+
+### Check for Orphaned Entity Files on Disk
+After deletion, verify ZERO LOB entity files remain anywhere on disk. `WCClassAdjustment_Ext.eti` was found still sitting on disk after WCM removal was declared "complete."
+
+### Subsystem Tracing
+For each LOB entity, trace the full dependency chain:
+- Entity → batch processes → scheduler entries
+- Entity → event rules → order.txt → messaging destinations
+- Entity → plugin registries (`.gwp`)
+- Entity → webservice endpoints
+- Entity → systable registrations (ALL `systables*.xml` files)
+
+Entire subsystems were missed: WC Dividends (20+ files), NCCI Integration (7+ files), EPLI Events & Systables.
+
+### Shared File Coordination
+If another agent has recently edited a file you need to modify, RE-READ the file fresh before editing. During WCM removal, the entity agent and Gosu agent both edited `UnderwriterEvaluatorTriggeringPoint_Ext.gs` — the Gosu agent missed 4 typecodes because the entity agent had already partially edited the file. When a file has been edited by a prior LOB removal pass, the next pass's agent MUST re-read it fresh.
+
+### Never Modify Platform-Owned Files
+Never modify files in `config/metadata/entity/` or `config/metadata/typelist/`. 45 files were wrongly modified during past removals.
