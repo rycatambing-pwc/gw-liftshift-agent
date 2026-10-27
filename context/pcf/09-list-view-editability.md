@@ -1,6 +1,6 @@
 # Making a List View Editable
 
-Source: Guidewire Education module (highest confidence). Builds directly on `/context/08-list-view-architecture.md`.
+Source: Guidewire Education module (highest confidence). Builds directly on `.claude/context/pcf/08-list-view-architecture.md`.
 
 ## What "Editable" Means for a List View
 
@@ -11,7 +11,7 @@ A List View can display an array of entities, database query results, reference 
 Editability cascades through four nested levels, each independently identifiable/configurable:
 
 1. **List View Panel** — the outer editable container
-2. **Row Iterator** — the editable iteration mechanism (see `/context/08-list-view-architecture.md`)
+2. **Row Iterator** — the editable iteration mechanism (see `.claude/context/pcf/08-list-view-architecture.md`)
 3. **Row** — an individual editable row
 4. **Cell** — an individual editable value within a row
 
@@ -29,7 +29,7 @@ These are "iterator buttons," governed by the Row Iterator's properties:
 
 **Rule for generated PCF:** don't hand-roll custom visibility/availability logic for these buttons — this exact combination (edit-mode-gated visibility; action-defined + selection-gated availability for Remove) is the standard, expected behavior.
 
-## Toolbar Placement Recommendation (refines, doesn't contradict, `/rules/04-toolbar-placement-and-edit-workflow.md`)
+## Toolbar Placement Recommendation (refines, doesn't contradict, `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`)
 
 - A List View **requires** a toolbar — it's where paging controls and any needed buttons live.
 - **Recommended split:** put the Edit button on the **screen-level toolbar**; put the Add/Remove (iterator) buttons on the **toolbar closest to the List View** itself.
@@ -48,5 +48,5 @@ These are "iterator buttons," governed by the Row Iterator's properties:
 
 ## Cross-References
 
-- Root-object semantics (`addTo`/`removeFrom` functions) from `/context/08-list-view-architecture.md` are what actually make row insertion/removal possible at the data layer — this module describes the *UI* side (buttons/visibility) that triggers those underlying functions.
-- Standard Edit/Update/Cancel toolbar behavior is in `/rules/04-toolbar-placement-and-edit-workflow.md` — Add/Remove are a List-View-specific addition on top of that same edit-mode-gated pattern (Add/Remove are also only visible in edit mode, same as the general Edit workflow).
+- Root-object semantics (`addTo`/`removeFrom` functions) from `.claude/context/pcf/08-list-view-architecture.md` are what actually make row insertion/removal possible at the data layer — this module describes the *UI* side (buttons/visibility) that triggers those underlying functions.
+- Standard Edit/Update/Cancel toolbar behavior is in `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md` — Add/Remove are a List-View-specific addition on top of that same edit-mode-gated pattern (Add/Remove are also only visible in edit mode, same as the general Edit workflow).

@@ -1,6 +1,6 @@
 # Post-on-Change: Implementation and Performance
 
-Source: Guidewire Education module. Deep-dive companion to `/context/17-dynamic-ui-and-post-on-change.md` — read that one first for the conceptual basics.
+Source: Guidewire Education module. Deep-dive companion to `.claude/context/pcf/17-dynamic-ui-and-post-on-change.md` — read that one first for the conceptual basics.
 
 ## Enabling It
 

@@ -1,6 +1,6 @@
 # Modes: Dispatch Mechanics and Defaults
 
-Source: Guidewire Education module. Extends and significantly deepens `/context/05-shared-sections-and-modes.md`.
+Source: Guidewire Education module. Extends and significantly deepens `.claude/context/pcf/05-shared-sections-and-modes.md`.
 
 ## Why Modes Exist
 
@@ -39,11 +39,11 @@ Despite `ABPersonVendor` being a subtype of `ABPerson`, and `ABDoctor` being a s
 
 ## PolicyCenter: Modes for Transaction Type
 
-In PolicyCenter, modes are also used to handle variations by **policy transaction type** — submission, change, renewal, cancellation, etc. This confirms and validates the `submission`/`policychange`-style mode name examples previously noted (with lower confidence) in `/context/05-shared-sections-and-modes.md` — same underlying pattern, now backed by a higher-confidence source.
+In PolicyCenter, modes are also used to handle variations by **policy transaction type** — submission, change, renewal, cancellation, etc. This confirms and validates the `submission`/`policychange`-style mode name examples previously noted (with lower confidence) in `.claude/context/pcf/05-shared-sections-and-modes.md` — same underlying pattern, now backed by a higher-confidence source.
 
 ## Naming Conventions for Modes (three distinct cases)
 
-See `/rules/01-naming-and-organization.md` for the consolidated rule. Summary:
+See `.claude/rules/pcf-agent-rules/01-naming-and-organization.md` for the consolidated rule. Summary:
 
 1. **Adding a new mode to an existing BASE product PCF** → suffix the **mode name** with `_Ext`. Example: base file `ABCompanyVendorSpecialtyInputSet.pcf` gets a new mode for Auto Rental Agencies named `ABAutoRentalAgcy_Ext`.
 2. **Creating an entirely new modal PCF (new file)** → suffix the **PCF name** with `_Ext`, inserted before the type suffix. Example: `ABGenericVendor_ExtInputSet` (name `ABGenericVendor` + `_Ext` + type suffix `InputSet`). Note: for Input Sets, the appended type suffix is the full word `InputSet`, not an abbreviation like `LV`/`DV`.

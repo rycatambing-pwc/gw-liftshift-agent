@@ -1,10 +1,10 @@
 # Input Sets
 
-Source: Guidewire Education module (highest confidence). This is the third confirmed instance of the same inline-vs-reusable-PCF-file pattern seen for Detail Views (`/context/07-detail-views-inline-vs-reusable.md`) and List Views (`/context/08-list-view-architecture.md`) — Guidewire applies this pattern consistently across container types.
+Source: Guidewire Education module (highest confidence). This is the third confirmed instance of the same inline-vs-reusable-PCF-file pattern seen for Detail Views (`.claude/context/pcf/07-detail-views-inline-vs-reusable.md`) and List Views (`.claude/context/pcf/08-list-view-architecture.md`) — Guidewire applies this pattern consistently across container types.
 
 ## What an Input Set Is
 
-A collection of atomic widgets organized into a logical group, letting developers reuse the same content (and layout) across multiple places. Confirms and reinforces the nesting rules already in `/rules/03-container-nesting-constraints.md`:
+A collection of atomic widgets organized into a logical group, letting developers reuse the same content (and layout) across multiple places. Confirms and reinforces the nesting rules already in `.claude/rules/pcf-agent-rules/03-container-nesting-constraints.md`:
 
 - Input Sets **must** be embedded into Detail View Panels.
 - Input Sets are **not** referenced by secondary views (Card, List Detail Panel).
@@ -22,7 +22,7 @@ A collection of atomic widgets organized into a logical group, letting developer
 - Inherits its parent's root object (a variable can be defined for it, but this is uncommon).
 
 ### Reusable PCF File
-- Becomes its own top-level PCF file, with its **own root object** declared (via `<Require>` — see `/context/05-shared-sections-and-modes.md`).
+- Becomes its own top-level PCF file, with its **own root object** declared (via `<Require>` — see `.claude/context/pcf/05-shared-sections-and-modes.md`).
 - Included elsewhere via the **`InputSetRef`** widget — analogous to `PanelRef`, specifying the file name and passing the required argument(s).
 - Create as a reusable file when the same set of widgets is needed in multiple places.
 

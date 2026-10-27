@@ -1,10 +1,10 @@
 # Location Groups
 
-Source: Guidewire Education module (highest confidence). Extends `/context/03-locations-reference.md` and `/context/13-navigating-to-locations.md`.
+Source: Guidewire Education module (highest confidence). Extends `.claude/context/pcf/03-locations-reference.md` and `.claude/context/pcf/13-navigating-to-locations.md`.
 
 ## What a Location Group Is
 
-A collection of Locations, providing structure and navigation for a group of related pages. Recap of UI elements (consistent with `/context/03-locations-reference.md`):
+A collection of Locations, providing structure and navigation for a group of related pages. Recap of UI elements (consistent with `.claude/context/pcf/03-locations-reference.md`):
 
 - **Tab bar** — tabs across the top of the application
 - **Info bar** — widgets below the tabs, above the screen area (some Location Groups have none — the strip is simply absent)
@@ -76,4 +76,4 @@ So the underlying syntax (`EntryPoint.method(args)`) is constant; **which method
 
 No file-extension/suffix is strictly required for a Location Group's filename, but it's **good practice to add the suffix `Group`** (e.g. `AccountGroup`, `DesktopGroup` — matches both examples given).
 
-> Open question: how this `Group` suffix convention interacts with the `_Ext` custom-file convention (`/rules/01-naming-and-organization.md`) for a *custom* Location Group isn't confirmed — e.g. is it `MyCustom_ExtGroup` or `MyCustomGroup_Ext`? Flagged in `/unresolved/01-open-questions.md`.
+> Open question: how this `Group` suffix convention interacts with the `_Ext` custom-file convention (`.claude/rules/pcf-agent-rules/01-naming-and-organization.md`) for a *custom* Location Group isn't confirmed — e.g. is it `MyCustom_ExtGroup` or `MyCustomGroup_Ext`? Flagged in `.claude/context/pcf/open-questions.md`.

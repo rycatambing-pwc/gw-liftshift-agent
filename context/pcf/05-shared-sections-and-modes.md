@@ -18,7 +18,7 @@ Guidewire Studio requires unique file names, so different mode variants of the "
 - If a PanelSet needs more than ~3–4 distinct modes, consider splitting into separate purpose-built PanelSets instead.
 - Document which modes exist and where they're used, via comments in the PCF.
 
-> ✅ CONFIDENCE UPDATE: the `submission`/`policychange`-style mode name examples above were originally sourced from a lower-confidence Documentation Assistant batch. A later, higher-confidence Guidewire Education module (`/context/20-modes-dispatch-and-defaults.md`) independently confirmed that PolicyCenter uses modes for exactly this purpose — transaction type variations (submission, change, renewal, cancellation). Treat this specific naming pattern as confirmed. See that file also for full mode-dispatch mechanics (subtype-based exact-type matching, default fallback, and the three-part mode naming convention in `/rules/01-naming-and-organization.md`).
+> ✅ CONFIDENCE UPDATE: the `submission`/`policychange`-style mode name examples above were originally sourced from a lower-confidence Documentation Assistant batch. A later, higher-confidence Guidewire Education module (`.claude/context/pcf/20-modes-dispatch-and-defaults.md`) independently confirmed that PolicyCenter uses modes for exactly this purpose — transaction type variations (submission, change, renewal, cancellation). Treat this specific naming pattern as confirmed. See that file also for full mode-dispatch mechanics (subtype-based exact-type matching, default fallback, and the three-part mode naming convention in `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`).
 
 ## RESOLVED: The Actual Reference Mechanism — `def=`
 
@@ -54,7 +54,7 @@ A `PanelRef` isn't always self-closing — it can have child content, most commo
 
 An empty `<Toolbar/>` inside a `PanelRef` is also valid — it simply adds no extra buttons.
 
-**Resolution note:** neither of the two earlier guessed attribute names (`ref=`, `panelName=`) appear in real code. The earlier "anonymous, attribute-less `PanelRef`" observation (from an isolated release-notes diff snippet) likely just reflected a truncated/partial view of a larger element that did have a `def=` attribute outside the visible diff — not a genuinely different, attribute-less usage. Full history preserved in `/unresolved/01-open-questions.md` for audit purposes.
+**Resolution note:** neither of the two earlier guessed attribute names (`ref=`, `panelName=`) appear in real code. The earlier "anonymous, attribute-less `PanelRef`" observation (from an isolated release-notes diff snippet) likely just reflected a truncated/partial view of a larger element that did have a `def=` attribute outside the visible diff — not a genuinely different, attribute-less usage. Full history preserved in `.claude/context/pcf/open-questions.md` for audit purposes.
 
 ### Mode mechanism vs. `def`/`Require`
 

@@ -58,4 +58,4 @@ Multi-line products (e.g. commercial package) use a modified version of this str
 
 ## Package Placement (from Education material)
 
-All custom PCFs should live in the appropriate existing or custom **PCF package**, and related PCFs should be grouped in the same package. It has not been confirmed whether "package" is simply Studio's term for these same `job`/`policy`/`policyfile` folders, or a distinct organizational concept layered on top — treat as probably-the-same-thing but unconfirmed. See `/unresolved/01-open-questions.md`.
+All custom PCFs should live in the appropriate existing or custom **PCF package**, and related PCFs should be grouped in the same package. It has not been confirmed whether "package" is simply Studio's term for these same `job`/`policy`/`policyfile` folders, or a distinct organizational concept layered on top — treat as probably-the-same-thing but unconfirmed. See `.claude/context/pcf/open-questions.md`.

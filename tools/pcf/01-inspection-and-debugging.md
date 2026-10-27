@@ -24,4 +24,4 @@ This is useful conceptually when reasoning about *why* a widget behaves a certai
 
 ## The Authoritative Schema Reference (not yet obtained)
 
-`modules/pcf.html`, inside an actual InsuranceSuite installation, is repeatedly cited as the complete, authoritative per-element/per-attribute PCF reference. It has not been successfully retrieved via public web documentation — it may only be accessible from a real installation or Guidewire Studio itself. If accessible to the team, pulling its content should be a high priority; it would resolve most of the open questions in `/unresolved/01-open-questions.md`.
+`modules/pcf.html`, inside an actual InsuranceSuite installation, is repeatedly cited as the complete, authoritative per-element/per-attribute PCF reference. It has not been successfully retrieved via public web documentation — it may only be accessible from a real installation or Guidewire Studio itself. If accessible to the team, pulling its content should be a high priority; it would resolve most of the open questions in `.claude/context/pcf/open-questions.md`.

@@ -1,6 +1,6 @@
 # List View Filtering
 
-Source: Guidewire Education module (highest confidence). Complements `/context/10-view-entities-and-performance.md` — filtering is another lever for List View performance, alongside View Entity column extension.
+Source: Guidewire Education module (highest confidence). Complements `.claude/context/pcf/10-view-entities-and-performance.md` — filtering is another lever for List View performance, alongside View Entity column extension.
 
 ## Why Filter
 
@@ -8,7 +8,7 @@ Filtering limits the data set a query returns, letting users focus on what they 
 
 ## Mechanism: Gosu Standard Query Filters
 
-If a List View is **query-backed** (see `/context/10-view-entities-and-performance.md`), filters can be created using **Gosu Standard Query Filters**.
+If a List View is **query-backed** (see `.claude/context/pcf/10-view-entities-and-performance.md`), filters can be created using **Gosu Standard Query Filters**.
 
 ## The Toolbar Filter Widget
 
@@ -40,4 +40,4 @@ A Toolbar Filter can silently restrict a query-backed List View's results **with
 
 Result: the filter is applied automatically on load, with no visible filter control shown to the user.
 
-(This is a strong candidate for its own `/skills/` entry — see skills file.)
+(This is a strong candidate for its own `.claude/skills/` entry — see skills file.)

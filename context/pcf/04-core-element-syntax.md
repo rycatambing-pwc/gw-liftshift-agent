@@ -2,7 +2,7 @@
 
 Source: Guidewire public documentation, filtered to only uncontradicted, concretely-sourced examples (several came from a real release-notes diff file, `APDRiskPanelSet.pcf`, which gives higher confidence than narrative-only descriptions). Cross-checked against Education modules where they overlap.
 
-> This is a partial reference. The authoritative, complete attribute-level schema is `modules/pcf.html` in an actual InsuranceSuite installation — not yet obtained. Treat this file as "known-good examples," not an exhaustive spec. See `/unresolved/01-open-questions.md`.
+> This is a partial reference. The authoritative, complete attribute-level schema is `modules/pcf.html` in an actual InsuranceSuite installation — not yet obtained. Treat this file as "known-good examples," not an exhaustive spec. See `.claude/context/pcf/open-questions.md`.
 
 ## Root Element
 
@@ -22,7 +22,7 @@ Static, localizable text for labels/buttons/titles, referenced by ID elsewhere i
 
 ## Non-visible Logic — `<Code>`
 
-Contains Gosu code for background operations/initialization/validation. **Rule: keep this minimal** — see `/rules/02-code-and-content-practices.md`.
+Contains Gosu code for background operations/initialization/validation. **Rule: keep this minimal** — see `.claude/rules/pcf-agent-rules/02-code-and-content-practices.md`.
 
 ## Variables — `<Variable>`
 
@@ -84,7 +84,7 @@ Must be nested inside a `<Toolbar>`. Confirmed real example:
 - `def` — the target panel's name plus a parenthesized argument expression satisfying that panel's `<Require>` declaration.
 - Can optionally contain a nested `<Toolbar>` to append extra buttons to the included panel at the inclusion site.
 
-See `/context/05-shared-sections-and-modes.md` for full detail and the related `<Require>` mechanism below.
+See `.claude/context/pcf/05-shared-sections-and-modes.md` for full detail and the related `<Require>` mechanism below.
 
 ## Parameterization — `<Require>` (CONFIRMED from real project code)
 

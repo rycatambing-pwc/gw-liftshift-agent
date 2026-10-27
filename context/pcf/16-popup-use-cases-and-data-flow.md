@@ -1,6 +1,6 @@
 # Popups: Use Cases and Data Flow
 
-Source: Guidewire Education module. Extends `/context/03-locations-reference.md` (structural definition: single screen + "Return to `<previous location>`" link).
+Source: Guidewire Education module. Extends `.claude/context/pcf/03-locations-reference.md` (structural definition: single screen + "Return to `<previous location>`" link).
 
 ## Why Popups Work This Way (the design rationale)
 
@@ -22,7 +22,7 @@ A popup can also be configured to create new objects — often the same popup ha
 
 **Data flow for create-new — different from edit-existing:** the source container (often a List View Panel) does **not** already know about the new object. So the popup **must return the new object to the source container**, and the source container is then responsible for **committing that object into the appropriate array** associated with its parent object.
 
-> This is the conceptual contract behind the "creation popup" pattern flagged as out-of-scope in `/context/09-list-view-editability.md` (Add-button Pattern B). We now know the *shape* of what needs to happen (object must be returned to the caller, caller commits it into its array) even though the exact PCF syntax for "returning" a value from a popup hasn't been seen yet. See `/unresolved/01-open-questions.md`.
+> This is the conceptual contract behind the "creation popup" pattern flagged as out-of-scope in `.claude/context/pcf/09-list-view-editability.md` (Add-button Pattern B). We now know the *shape* of what needs to happen (object must be returned to the caller, caller commits it into its array) even though the exact PCF syntax for "returning" a value from a popup hasn't been seen yet. See `.claude/context/pcf/open-questions.md`.
 
 ### 3. Search for an Existing Record
 

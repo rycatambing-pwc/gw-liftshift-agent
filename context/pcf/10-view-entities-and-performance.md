@@ -1,6 +1,6 @@
 # View Entities and List View Performance
 
-Source: Guidewire Education module (highest confidence). Extends `/context/08-list-view-architecture.md` and `/context/09-list-view-editability.md` — specifically the "root object is a query result set, not a parent entity" case.
+Source: Guidewire Education module (highest confidence). Extends `.claude/context/pcf/08-list-view-architecture.md` and `.claude/context/pcf/09-list-view-editability.md` — specifically the "root object is a query result set, not a parent entity" case.
 
 ## What a View Entity Is
 
@@ -19,7 +19,7 @@ For a List View backed by a View Entity, the **RowIterator** is defined using th
 gw.api.database.IQueryBeanResult<gw.pl.persistence.core.Bean>
 ```
 
-This is the concrete mechanism behind the "root object is the set of elements itself, not a parent entity" case noted in `/context/08-list-view-architecture.md` — a query-backed List View has no natural parent object, so it's backed by a queried View Entity instead, and (per that earlier note) doesn't get `addTo`/`removeFrom` editability for free.
+This is the concrete mechanism behind the "root object is the set of elements itself, not a parent entity" case noted in `.claude/context/pcf/08-list-view-architecture.md` — a query-backed List View has no natural parent object, so it's backed by a queried View Entity instead, and (per that earlier note) doesn't get `addTo`/`removeFrom` editability for free.
 
 ## The Performance Problem and Its Fix
 

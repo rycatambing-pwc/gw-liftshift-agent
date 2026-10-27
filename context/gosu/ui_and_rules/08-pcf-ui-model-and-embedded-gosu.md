@@ -2,12 +2,12 @@
 document: pcf-ui-model-and-embedded-gosu
 purpose: Gosu-specific behavior inside PCF — embedded expressions, variable scope, dynamic behavior, validation
 scope: RowIterator elementName, validation expressions, PostOnChange, Client Reflection, performance, UI helper classes
-note: PCF structure (widget hierarchy, location types, DetailView, PanelRef) is covered in /context/pcf/. This file covers only what the Gosu agent needs when reading or writing embedded Gosu expressions inside PCF files.
+note: PCF structure (widget hierarchy, location types, DetailView, PanelRef) is covered in .claude/context/pcf/. This file covers only what the Gosu agent needs when reading or writing embedded Gosu expressions inside PCF files.
 ---
 
 # Embedded Gosu in PCF Files
 
-For PCF structure (widget/location hierarchy, DetailView inline vs. reusable, PanelRef/Require, modes), see `/context/pcf/`.
+For PCF structure (widget/location hierarchy, DetailView inline vs. reusable, PanelRef/Require, modes), see `.claude/context/pcf/`.
 
 ## Variable scope inside PCF
 

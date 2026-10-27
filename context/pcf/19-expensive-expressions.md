@@ -1,6 +1,6 @@
 # Expensive Expressions: An Anti-Pattern Catalog
 
-Source: Guidewire Education module. Extends `/context/17-dynamic-ui-and-post-on-change.md` and `/context/18-post-on-change-implementation-and-performance.md`.
+Source: Guidewire Education module. Extends `.claude/context/pcf/17-dynamic-ui-and-post-on-change.md` and `.claude/context/pcf/18-post-on-change-implementation-and-performance.md`.
 
 ## Dynamic Properties — One Addition
 
@@ -36,8 +36,8 @@ Also run a background query and iterate the results. Commonly return a **larger 
 
 ## Real Anti-Pattern Example: Permission Checks via Collection Methods
 
-A `PrimaryPhone` TextInput's `Editable` property used a collection method to check whether the current user's *only* role is "Claims Supervisor." This runs a background query and iterates over all the user's roles — inefficient, **and** it bypasses the application/system permission framework that already exists for exactly this purpose. See `/rules/08-performance-expensive-expressions.md` for the correct alternative (application permission keys).
+A `PrimaryPhone` TextInput's `Editable` property used a collection method to check whether the current user's *only* role is "Claims Supervisor." This runs a background query and iterates over all the user's roles — inefficient, **and** it bypasses the application/system permission framework that already exists for exactly this purpose. See `.claude/rules/pcf-agent-rules/08-performance-expensive-expressions.md` for the correct alternative (application permission keys).
 
 ## See Also
 
-`/rules/08-performance-expensive-expressions.md` for the concrete fix patterns (PCF variables, Row Iterator variables, permission keys) and `/skills/05-optimizing-expensive-expressions.md` for the step-by-step remediation workflow.
+`.claude/rules/pcf-agent-rules/08-performance-expensive-expressions.md` for the concrete fix patterns (PCF variables, Row Iterator variables, permission keys) and `.claude/skills/pcf-agent-skills/references/05-optimizing-expensive-expressions.md` for the step-by-step remediation workflow.

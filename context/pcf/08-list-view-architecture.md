@@ -1,6 +1,6 @@
 # List View Architecture
 
-Source: Guidewire Education module (highest confidence). Companion to `/context/07-detail-views-inline-vs-reusable.md` — List Views follow the same inline-vs-reusable-PCF-file pattern as Detail Views.
+Source: Guidewire Education module (highest confidence). Companion to `.claude/context/pcf/07-detail-views-inline-vs-reusable.md` — List Views follow the same inline-vs-reusable-PCF-file pattern as Detail Views.
 
 ## What a List View Is
 
@@ -13,7 +13,7 @@ A List View Panel shows **summary information about a collection of objects** (a
 - Generated markup for a row widget is a `<TR>` HTML tag.
 - Within a Row Iterator, the object for the current row is referenced via the variable defined in the `elementName` property (e.g. when configuring a cell's `value`/`action`). As the iterator processes each object in the array in turn, `elementName` points to that object for the duration of that row's processing.
 
-> Cross-reference: `elementName` was already noted as an `<InputIterator>` attribute in `/context/04-core-element-syntax.md`. Not yet confirmed whether "Row Iterator" is a distinct XML element (e.g. a hypothetical `<RowIterator>`) or simply describes how `<InputIterator>` behaves specifically in a List View context. See `/unresolved/01-open-questions.md`.
+> Cross-reference: `elementName` was already noted as an `<InputIterator>` attribute in `.claude/context/pcf/04-core-element-syntax.md`. Not yet confirmed whether "Row Iterator" is a distinct XML element (e.g. a hypothetical `<RowIterator>`) or simply describes how `<InputIterator>` behaves specifically in a List View context. See `.claude/context/pcf/open-questions.md`.
 
 ## The List View's Root Object — Important Nuance
 
@@ -28,24 +28,24 @@ The PCF architecture has several iterator types beyond the Row Iterator:
 - **Panel Iterators** — take a set of objects, generate one panel (typically a Detail View) per object.
 - **PolicyCenter Coverage Iterators** — take a set of coverages tied to a covered item (e.g. a vehicle), generate one coverage input per coverage.
 
-None of these have confirmed XML syntax yet — flagged in `/unresolved/01-open-questions.md` for resolution via real code.
+None of these have confirmed XML syntax yet — flagged in `.claude/context/pcf/open-questions.md` for resolution via real code.
 
 ## Reusable vs. Inline (parallels Detail View exactly)
 
-Same pattern as `/context/07-detail-views-inline-vs-reusable.md`:
-- **Reusable:** List View Panel becomes its own top-level PCF file (filename convention ends in `LV`, per `/rules/01-naming-and-organization.md`), included elsewhere via `PanelRef`. Real example: `ABContactHistoryPage` (a Screen) includes `ABContactHistoryLV` via `PanelRef`.
+Same pattern as `.claude/context/pcf/07-detail-views-inline-vs-reusable.md`:
+- **Reusable:** List View Panel becomes its own top-level PCF file (filename convention ends in `LV`, per `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`), included elsewhere via `PanelRef`. Real example: `ABContactHistoryPage` (a Screen) includes `ABContactHistoryLV` via `PanelRef`.
 - **Inline:** declared directly inside a `Screen`, `Card View Panel`, or `List Detail Panel`. Not referenceable by other files. Inherits its parent's root object (a variable can be defined for it, but this is uncommon).
 
 ## Containment Exception: Embedding a List View Inside a Detail View
 
-Both Detail View and List View are **primary containers**. The general rule (see `/rules/03-container-nesting-constraints.md`) is that a primary container can only contain atomic widgets, not other containers — so you **cannot** use `PanelRef` to include a List View inside a Detail View.
+Both Detail View and List View are **primary containers**. The general rule (see `.claude/rules/pcf-agent-rules/03-container-nesting-constraints.md`) is that a primary container can only contain atomic widgets, not other containers — so you **cannot** use `PanelRef` to include a List View inside a Detail View.
 
 **The workaround: `ListViewInput`.** This widget forces the List View to *behave as* an atomic widget:
 - It can then be placed anywhere inside a Detail View's `InputColumn`.
 - Because it behaves as an atomic widget, it can also take a **label**, the way a normal atomic widget can.
 
-> Note: earlier material described "List View Input" simply as "an editable tabular display" (a contrast with the read-only "List View"). This module frames `ListViewInput` specifically as the mechanism for embedding a List View inside a Detail View by making it act atomic. These are likely the same widget serving both a structural purpose (embeddable-as-atomic) and a behavioral one (editable) — but exact attribute syntax for `ListViewInput` has not been seen in real code yet. Don't assume full behavior until confirmed. See `/unresolved/01-open-questions.md`.
+> Note: earlier material described "List View Input" simply as "an editable tabular display" (a contrast with the read-only "List View"). This module frames `ListViewInput` specifically as the mechanism for embedding a List View inside a Detail View by making it act atomic. These are likely the same widget serving both a structural purpose (embeddable-as-atomic) and a behavioral one (editable) — but exact attribute syntax for `ListViewInput` has not been seen in real code yet. Don't assume full behavior until confirmed. See `.claude/context/pcf/open-questions.md`.
 
-## Toolbar Placement (reinforces `/rules/04-toolbar-placement-and-edit-workflow.md`)
+## Toolbar Placement (reinforces `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`)
 
-This module repeats, independently, the same toolbar placement rules already captured from the Detail View module — same "can be directly added to Screen/PanelRef/List View Input," "can be associated with Detail/Card/List Detail/List View Panels," "not directly placeable on an Input Set" pattern. Treat `/rules/04` as doubly confirmed; no changes needed there.
+This module repeats, independently, the same toolbar placement rules already captured from the Detail View module — same "can be directly added to Screen/PanelRef/List View Input," "can be associated with Detail/Card/List Detail/List View Panels," "not directly placeable on an Input Set" pattern. Treat `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md` as doubly confirmed; no changes needed there.

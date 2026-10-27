@@ -1,6 +1,6 @@
 # Validation Expressions
 
-Source: Guidewire Education module. Complements `/context/21-ui-field-validation.md` (which covered regex-based validation) — this module covers **expression-based** validation logic instead.
+Source: Guidewire Education module. Complements `.claude/context/pcf/21-ui-field-validation.md` (which covered regex-based validation) — this module covers **expression-based** validation logic instead.
 
 ## The Ternary Pattern
 

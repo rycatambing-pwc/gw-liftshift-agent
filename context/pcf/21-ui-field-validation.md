@@ -15,7 +15,7 @@ Prevents a user from saving a page's contents if a field's entered data doesn't 
 | | Data Model Validation | UI (Field-Level) Validation |
 |---|---|---|
 | Scope | Applies statically, across the **entire application**, regardless of entry point | Tied to a specific field on a specific PCF (or mode) |
-| Use when | The constraint should hold everywhere, including via API — e.g. a UK insurer requiring a National Health number to always be exactly 10 decimal digits, whether entered via UI or another application's API | The valid format legitimately **varies by context** — e.g. phone number format differing by country, shown via different modal PCFs (see `/context/20-modes-dispatch-and-defaults.md`) |
+| Use when | The constraint should hold everywhere, including via API — e.g. a UK insurer requiring a National Health number to always be exactly 10 decimal digits, whether entered via UI or another application's API | The valid format legitimately **varies by context** — e.g. phone number format differing by country, shown via different modal PCFs (see `.claude/context/pcf/20-modes-dispatch-and-defaults.md`) |
 
 **Rule of thumb:** if the format constraint is a universal business rule independent of how data enters the system, use data model validation. If the constraint depends on UI context (which mode/PCF/locale is active), use UI-level regex validation.
 
@@ -27,7 +27,7 @@ A `getPostalCodeRegex()` Gosu function returns a different regex depending on th
 - Reusable across **multiple PCFs**, not locked to one file.
 - **Single place to modify** if the logic needs to change, rather than updating it redundantly across every PCF that needs it.
 
-(This is the same underlying principle as `/rules/02-code-and-content-practices.md`'s "minimize Gosu in `<Code>` blocks, extract to reusable Gosu classes" guidance — this module gives a concrete validation-specific example of exactly that principle in action.)
+(This is the same underlying principle as `.claude/rules/pcf-agent-rules/02-code-and-content-practices.md`'s "minimize Gosu in `<Code>` blocks, extract to reusable Gosu classes" guidance — this module gives a concrete validation-specific example of exactly that principle in action.)
 
 ## Why UI-Level Validation Specifically Helps
 

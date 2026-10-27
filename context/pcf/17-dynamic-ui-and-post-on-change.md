@@ -1,6 +1,6 @@
 # Dynamic UI Basics
 
-Source: Guidewire Education module. This is the "later lesson" on dynamic updates flagged as a follow-up in `/context/12-input-sets.md`.
+Source: Guidewire Education module. This is the "later lesson" on dynamic updates flagged as a follow-up in `.claude/context/pcf/12-input-sets.md`.
 
 ## Static vs. Dynamic Widget Properties
 
@@ -13,7 +13,7 @@ Source: Guidewire Education module. This is the "later lesson" on dynamic update
 
 Not all widgets have all properties — the **PCF Format Reference** defines, per widget, which properties (called **"attributes"** in that reference) exist and what value type each takes.
 
-> ⚠️ FILENAME DISCREPANCY: this module states the PCF Format Reference is opened via `<ApplicationRootDirectory>\modules\pcf.htm`. Every earlier mention (several times, across different sources) said `pcf.html`. Likely an imprecise transcription somewhere, but flagging rather than silently resolving — confirm the real filename before telling anyone where to look. See `/unresolved/01-open-questions.md`.
+> ⚠️ FILENAME DISCREPANCY: this module states the PCF Format Reference is opened via `<ApplicationRootDirectory>\modules\pcf.htm`. Every earlier mention (several times, across different sources) said `pcf.html`. Likely an imprecise transcription somewhere, but flagging rather than silently resolving — confirm the real filename before telling anyone where to look. See `.claude/context/pcf/open-questions.md`.
 
 ## Dynamic Properties vs. Dynamic Behavior — Key Distinction
 
