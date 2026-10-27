@@ -107,8 +107,8 @@ Step-by-step recipe for adding a new tab to an existing CardViewPanel without di
 
 ## Cross-references
 
-- CardView summary panel pattern: `/skills/pcf-agent-skills/01-building-a-cardview-summary-panel.md`
-- PanelRef/Require: `/context/pcf/05-shared-sections-and-modes.md`
-- Toolbar injection via PanelRef: `/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
-- Naming: `/rules/pcf-agent-rules/01-naming-and-organization.md`
-- Nesting rules: `/rules/pcf-agent-rules/03-container-nesting-constraints.md`
+- CardView summary panel pattern: `.claude/skills/pcf-agent-skills/references/01-building-a-cardview-summary-panel.md`
+- PanelRef/Require: `.claude/context/pcf/05-shared-sections-and-modes.md`
+- Toolbar injection via PanelRef: `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
+- Naming: `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`
+- Nesting rules: `.claude/rules/pcf-agent-rules/03-container-nesting-constraints.md`

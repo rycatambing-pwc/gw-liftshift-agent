@@ -45,7 +45,7 @@ Entire subsystems missed:
 
 ### 5. Delete H2 Database After Entity/Systable Changes
 **Error count:** 3 startup failures
-**Fix:** Delete `tmp/pc.mv.db` and `tmp/pc.lock.db` after any entity or systable deletion.
+**Fix:** Delete `<config_root>/tmp/pc.mv.db` and `<config_root>/tmp/pc.lock.db` after any entity or systable deletion (the file named by `jdbc-url` in `config/database-config.xml`; a same-named file in another `tmp/` folder is not the one the server opens).
 
 ### 6. Never Modify Platform-Owned Files
 **Error count:** 45 files wrongly modified, had to restore from git
@@ -150,6 +150,8 @@ Dead files left behind: `CPRequirements.gs` (gtest), `SmallSampleCommunityData.g
 ---
 
 ## Post-Removal Verification Checklist
+
+The detailed yes/no version, built from the catalog above, is `known-answer-checklist.md`. Use it in Phases 15 and 19.
 
 - [ ] Full grep sweep with start-boundary patterns across ALL mandatory search paths
 - [ ] ZERO hits in ALL locale variant properties files (en_US, yy, es, es_ES, EDG, EDG_PH)

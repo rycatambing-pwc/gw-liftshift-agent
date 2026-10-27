@@ -4,13 +4,13 @@ Use this when a query-backed List View needs to always be scoped to some conditi
 
 ## When to use this pattern
 
-- The List View is query-backed (see `/context/10-view-entities-and-performance.md`).
+- The List View is query-backed (see `.claude/context/pcf/10-view-entities-and-performance.md`).
 - The scoping condition should always apply and isn't something the user needs to toggle.
 - Examples: "my open activities," "records for the account currently being viewed," "items not yet closed."
 
 ## Steps
 
-1. **Construct the filter expression** that restricts the result set to the desired condition. If the logic is more than trivial, put it in a Gosu function rather than inlining it (see `/rules/05-list-view-performance.md`) — better performance and easier to maintain/test.
+1. **Construct the filter expression** that restricts the result set to the desired condition. If the logic is more than trivial, put it in a Gosu function rather than inlining it (see `.claude/rules/pcf-agent-rules/05-list-view-performance.md`) — better performance and easier to maintain/test.
 2. **Add a Toolbar Filter widget** to the List View's toolbar, using the Filter Options tab.
 3. **Choose the filter type:**
    - `ToolbarFilterOption` if the filter resolves to a single filter object.
@@ -29,5 +29,5 @@ A **user-facing** filter (where the user picks from filter options, like the "My
 
 ## Cross-references
 
-- Performance rules for filter construction: `/rules/05-list-view-performance.md`
-- General List View / query-backed root object concepts: `/context/08-list-view-architecture.md`, `/context/10-view-entities-and-performance.md`
+- Performance rules for filter construction: `.claude/rules/pcf-agent-rules/05-list-view-performance.md`
+- General List View / query-backed root object concepts: `.claude/context/pcf/08-list-view-architecture.md`, `.claude/context/pcf/10-view-entities-and-performance.md`

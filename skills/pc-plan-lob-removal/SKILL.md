@@ -1,15 +1,20 @@
+---
+name: pc-plan-lob-removal
+description: Plans and runs the removal of a Line of Business (LOB) from a Guidewire PolicyCenter project -- discovers alternate LOB names, generates a phased plan from the template, and after user approval dispatches gw-gosu-agent, gw-pcf-agent, gw-entity-agent, gw-typelist-agent and gw-build-agent one phase at a time with verification gates. Runs in the main session because subagents cannot dispatch other agents. Use only when the user explicitly asks to remove, or plan the removal of, a specific LOB.
+---
+
 # Skill: pc-plan-lob-removal
 
 ## Purpose
 
-Generate and execute a comprehensive plan for removing a Line of Business (LOB) from an existing Guidewire PolicyCenter project. This skill is invoked by the `gw-planner` agent to produce a structured, phased removal plan, then orchestrate execution across specialized agents with mandatory verification at every phase boundary.
+Generate and execute a comprehensive plan for removing a Line of Business (LOB) from an existing Guidewire PolicyCenter project. This skill runs in the **main session**: it produces a structured, phased removal plan, then orchestrates execution by dispatching the specialized agents with the `Agent` tool, with mandatory verification at every phase boundary. It must not be run from inside a subagent (including `gw-planner`) — subagents cannot start other agents.
 
 **This skill was refined from 8 real LOB removals (CP7, CA7, WCM, GL7, CR7, CU, BP7, CPP) where the agent missed 50+ issues the user had to find manually. Every rule below exists because a real failure proved it necessary.**
 
 ## When to Activate
 
 - When the user requests removal of a Line of Business from PolicyCenter.
-- When the `gw-planner` agent needs to orchestrate LOB removal across multiple specialized agents.
+- When LOB removal must be orchestrated across multiple specialized agents (the main session runs this skill; `gw-planner` may be asked to review the generated plan).
 - When planning the decommissioning of an LOB that is no longer needed in the project.
 
 ---
@@ -20,6 +25,7 @@ Generate and execute a comprehensive plan for removing a Line of Business (LOB) 
 |-------|-------------|---------|
 | LOB Code | The short code identifying the Line of Business | `BP7`, `CU`, `UPL` |
 | Project Root | The root path of the PolicyCenter project (auto-detected from cwd) | `C:\dev\policycenter` |
+| Config Root (`<config_root>`) | The module folder that contains `config/`, `gsrc/` and `gtest/` (auto-detected; normally `modules/configuration`). Every path in the plan is written relative to it. | `modules/configuration` |
 
 ### Alternate Name Discovery (DO NOT ask an open-ended question)
 
@@ -58,60 +64,27 @@ Then uses AskUserQuestion multiSelect to let the user pick which are real LOB na
 
 ## Iron Rules — Violations WILL Cause Compile/Runtime Failures
 
-These rules are NON-NEGOTIABLE. Past LOB removals violated every one of them, causing 50+ errors the user had to find and fix manually.
+These rules are NON-NEGOTIABLE. The full text, with the failure each one came from, is in [references/hard-prohibitions.md](references/hard-prohibitions.md). **Load it in Step 0 and re-read it before dispatching any agent.** In short:
 
-### Rule 1: Consumer-First Deletion
-NEVER delete a definition (constant, typecode, entity, display key, typelist, enhancement) without FIRST grepping the ENTIRE codebase for all consumers. Sequence:
-1. Grep for the symbol across ALL directories (gsrc, config, gtest, integration)
-2. List every consumer found
-3. Remove every consumer first
-4. THEN delete the definition
-5. Grep again to verify zero references remain
-
-**Why this exists:** This rule was violated on EVERY LOB removal. The same file (`UnderwriterEvaluatorTriggeringPoint_Ext.gs`) broke 3 times across 3 different LOBs. Constants were deleted while Gosu files still referenced them. Typecodes were removed while PCFs still used them.
-
-### Rule 2: Start-Boundary Grep Only
-Use `\bWCM` NOT `\bWCM\b`. The end boundary misses compound identifiers like `WCMLocation`, `WCMLargeDeductible`.
-
-### Rule 3: Match Key Names, Not Entire Lines
-When grepping display/properties files, match on the key name (before the `=`) ONLY. Auto-generated hash IDs can contain LOB abbreviations by coincidence. A false positive on a hash containing `bp7` deleted a valid Restaurant QuestionChoice ("Night Club") and crashed server startup.
-
-### Rule 4: Sequential Agent Execution — No Parallel Edits to Shared Files
-NEVER run definition-deleting agents in parallel with reference-updating agents. Agent A (update/remove references) completes fully BEFORE Agent B (delete definitions) starts. Parallel execution orphaned references on every LOB removal.
-
-**Additionally:** NEVER let two agents edit the SAME file simultaneously. During CP7/CA7/GL7/WCM removal, a `display.properties` agent bulk-deleted all lines matching the LOB pattern while a separate Gosu agent renamed key references — each assuming the other hadn't touched the file. Similarly, `UnderwriterEvaluatorTriggeringPoint_Ext.gs` was edited by multiple LOB passes and the WCM agent missed 4 typecodes because earlier passes had already changed the file without the agent knowing.
-
-**When a file has been edited by ANY prior agent or prior LOB pass, the next agent MUST re-read the file fresh before editing.** Do not assume a file is in a known state.
-
-### Rule 5: Never Modify Platform-Owned Files
-Platform files include: `gw/webservice/*` API Javadoc, `config/metadata/*`, base `.eti`/`.tti`/`.tix` files, `display_*.properties` translations (except main `display.properties` for customer keys), `typelist_*.properties` translations for base typecodes. 45 files were wrongly modified during past removals and had to be restored from git.
-
-### Rule 6: Trace Subsystems, Not Individual Files
-Individual file deletion missed 20+ files in WCM alone. Entire subsystems were missed: WC Dividends (20+ files), NCCI Integration (7+ files), Crime Models/Verisk (8 files + 1 template), EPLI Events & Systables. For each LOB, trace the full dependency chain (see Phase 2).
-
-### Rule 7: Remove Dead References, Never Rename Them
-When a display key reference points to a removed LOB, REMOVE the reference entirely. Never rename it to another key. Renaming to nonexistent keys caused compile errors in CA7 (`PolicyContactRolePanelSet.PolicyAddlInsured.pcf`) and GL7 (`PolicyPeriodValidation_Ext.gs`).
-
-### Rule 8: Verify Syntax After Every Edit
-When removing an if-guard, case branch, or constant, verify the surrounding syntax is still valid. Check for orphaned braces `{` `}`, dangling else, or empty switch blocks. Read the file after editing. Orphaned braces in `SpecialCasesClauseLoadGenerator.gs` caused a parse error during WCM removal.
-
-### Rule 9: Validate XML After Bulk Block Removal
-When removing XML blocks (systable entries, FormPattern blocks, CancelRefund entries), the agent can accidentally mangle adjacent entries — stripping `<` from tags, orphaning text content. During CR7 removal from AAIS, the agent stripped `<` from `<ExpirationDate/>` on an adjacent CA7 entry in `cancel_refund.xml`, turning it into bare text that crashed server startup with "SCHEMA ERRORS IN PLUGIN FILES — Cannot have any text content."
-**After every bulk XML removal:** grep the file for orphaned text content (lines containing tag-like text without a `<` bracket). Validate the file is well-formed XML before declaring done.
-
-### Rule 10: Run git diff --stat After All Agents Complete
-Agents can accidentally empty or modify files they weren't supposed to touch. During CR7 removal from AAIS, the SurePath cleanup agent accidentally zeroed out two CA7 files (`CA7FormPatterns.1.NE.xml`, `CA7FormPatterns.2.SD.xml`), causing server startup failure.
-**After all execution phases complete and BEFORE the verification sweep:** run `git diff --stat` and verify:
-1. Only expected files were modified (no unexpected files in the diff)
-2. No files have size 0 (zeroed out accidentally)
-3. No non-LOB files were changed (e.g., CA7 files shouldn't change during CR7 removal)
-If unexpected files appear, restore them with `git checkout -- <file>`.
+1. **Consumer-first deletion.** Grep the whole codebase for consumers, remove them, then delete the definition, then grep again.
+2. **Start-boundary grep only.** `\b<code>`, never `\b<code>\b`.
+3. **Match key names, not whole lines.** Hash IDs contain LOB letters by coincidence.
+4. **Sequential agents, never two on one file.** Re-read any file a prior agent or pass touched.
+5. **Never modify platform-owned files.**
+6. **Trace subsystems, not individual files.**
+7. **Remove dead references; never rename them.**
+8. **Verify syntax after every edit.**
+9. **Validate XML after any bulk block removal.**
+10. **Run `git diff --stat` after all agents finish.**
+11. **Bulk edits only under the guarded procedure** (line-oriented files, dry run, control count, checks right after the edit).
 
 ---
 
 ## Mandatory Search Scope
 
 EVERY LOB removal must search ALL of these paths. Past removals missed files because the search scope was too narrow — the user manually found remnants in 24+ file categories the agent never searched.
+
+All paths in the table are relative to `<config_root>`. Check each one against it during discovery and list the ones that do not exist in the context file.
 
 | Category | Paths to Search |
 |----------|----------------|
@@ -149,7 +122,9 @@ EVERY LOB removal must search ALL of these paths. Past removals missed files bec
 
 ## Known Fragile Files
 
-These files aggregate content from multiple LOBs and break easily. Handle with special care:
+These files aggregate content from multiple LOBs and break easily. Handle with special care.
+
+The file names below come from the project the kit was refined on. Treat them as examples of the shape to look for (a file that lists or switches over every LOB's constants, typecodes or keys): confirm each exists in your project, and use the Phase 2 inventory to find the equivalents.
 
 | File | Why It's Fragile | Required Action |
 |------|-----------------|-----------------|
@@ -178,15 +153,38 @@ Short LOB prefixes generate false positives. Handle explicitly:
 
 ---
 
+## Approval Modes
+
+The user chooses **one** approval mode at the start (Step 0, item 10). It decides when the run waits for the user. It never changes what is checked: every phase's exit criteria are verified and logged in every mode.
+
+| Mode | The run waits for the user… | Use it for |
+|---|---|---|
+| **Checkpoints** (default) | (1) after Phase 2, to approve the plan and the discovery inventory; (2) before Phase 11, the first phase that deletes entity and typelist definitions; (3) before Phase 16, the full compile; (4) after Phase 19, for sign-off | Normal runs |
+| **Every phase** | at every phase boundary | The first run on a new repo, or when training someone |
+| **Continuous** | after Phase 2 only | Re-running on a repo you already know |
+
+Phases 1 and 2 only read the project (Phase 1 also builds it), so in every mode the plan is approved after Phase 2, with the inventory in hand. **No project file is edited or deleted before that approval.**
+
+**Stops no mode can skip.** Stop and ask the user when:
+- an unexpected error occurs, or a build or server failure does not match the startup-error table;
+- a grep hit cannot be classified as LOB-owned or platform/shared;
+- a whole shared file would be deleted;
+- `git diff --stat` shows an unexpected file or a zero-size file (Iron Rule 10);
+- a decision is needed that the plan does not cover.
+
+Record the chosen mode in the plan header and in the context file. Changing the mode mid-run is allowed only at a stop, and is logged.
+
+---
+
 ## Workflow
 
 ### Step 0: Load Resources, Discover Names, and Validate Prerequisites
 
-1. **Load the plan template** from `resources/lob-removal-plan-template.md`.
-2. **Load lessons learned** from `resources/lob-removal-lessons.md`.
+1. **Load the plan template** from `references/lob-removal-plan-template.md`.
+2. **Load lessons learned** from `references/lob-removal-lessons.md` **and the full Iron Rules** from `references/hard-prohibitions.md`.
 3. **Accept the LOB code** from the user (passed as argument or asked via single question).
-4. **Auto-detect the project root** from the current working directory (look for `modules/configuration/` or `gwb.bat`).
-5. **Verify agent definitions exist.** Check that `.claude/gw-liftshift-agent/agents/` (or `.claude/agents/`) contains these files:
+4. **Auto-detect the project root** from the current working directory (look for `modules/configuration/` or `gwb.bat`), then **resolve `<config_root>`**: the module folder that contains `config/`, `gsrc/` and `gtest/` (normally `modules/configuration`). Use it for every path in the plan; never assume a fixed prefix.
+5. **Verify agent definitions exist.** Check that `.claude/agents/` (the only project location Claude Code loads agents from) contains these files:
    - `gw-gosu-agent.md`
    - `gw-pcf-agent.md`
    - `gw-entity-agent.md`
@@ -194,22 +192,38 @@ Short LOB prefixes generate false positives. Handle explicitly:
    - `gw-build-agent.md`
    - `gw-planner-agent.md`
    
-   If missing, WARN the user: "Agent definitions not found — subagent delegation will not work. Clone the gw-liftshift-agent repo into the project's `.claude/` directory, or run without delegation (single agent mode)."
+   If missing, WARN the user: "Agent definitions not found — subagent delegation will not work. Install the kit as the project's `.claude/` directory (see the Installation section of the kit's README), or run without delegation (single agent mode)."
 6. **Run the Alternate Name Discovery procedure** (see Inputs section above):
    a. Grep the codebase for the LOB code across entity files, typelists, product model, Gosu, display properties, and InstalledPolicyLine.
    b. Extract candidate alternate names/prefixes from grep results.
    c. Present candidates as a multi-select question using `AskUserQuestion` — the user picks which are real LOB names.
 7. **Build the final grep pattern list** from the LOB code + user-confirmed alternates.
 8. **Generate the removal plan** by substituting `[lob_code]` placeholders with the actual LOB code.
-9. **Save the plan** at `.pwc/agent/plans/lob-removal-[lob_code].md`.
-10. **Present the plan** to the user and ask for approval before any execution begins.
+9. **Save the plan** at `.pwc/agent/plans/lob-removal-[lob_code].md` and **create the context file** `.pwc/agent/plans/lob-removal-[lob_code]-context.md` (see The Context File).
+10. **Present the plan** and ask the user to choose the approval mode (see Approval Modes) with `AskUserQuestion`. Then run Phases 1 and 2, which only read the project. **The plan is approved after Phase 2**, once the inventory is on the table. No project file is edited or deleted before that approval.
+
+### The Context File
+
+Discovery results are written down, not left in the conversation, so every phase prompt and any resumed session starts from the same facts. Create `.pwc/agent/plans/lob-removal-[lob_code]-context.md` at the end of Step 0 and complete it in Phase 2:
+
+| Section | Contents |
+|---|---|
+| Config root | The resolved `<config_root>`, and the paths from the Mandatory Search Scope that do not exist in this project |
+| Names | The LOB code, the confirmed alternate names, and every candidate the user rejected, with the reason |
+| Kept lines | Other LOBs and shared code that must survive this removal, with a control pattern for each kept LOB (its code) that must read non-zero in every sweep |
+| Approval mode | The chosen mode and its stop points |
+| Inventory | The Phase 2 inventory grouped by subsystem: the files and folders each subsystem owns |
+| Progress | The last completed phase and its date, updated at every phase boundary |
+
+Every agent task prompt carries the path to this file. Agents read it for the config root, the confirmed names and their part of the inventory instead of rediscovering them. **When a context file for this LOB already exists at the start of Step 0, read it, tell the user the last completed phase, and resume from there instead of re-running discovery.**
 
 ### Step 1: Execute Phases Sequentially
 
 Execute the phases defined in the plan template. At each phase boundary:
 - Verify exit criteria are met
 - Log all actions to the work log
-- Get user confirmation before proceeding
+- Update the Progress section of the context file
+- Wait for the user only where the approval mode says to (see Approval Modes); otherwise continue to the next phase
 
 ### Step 2: Mandatory Verification Sweep (NEW — This Was the #1 Gap)
 
@@ -224,11 +238,15 @@ After ALL deletion/modification phases complete, BEFORE declaring the LOB remova
 7. **Check `config/smoketests/`** — this directory was missed in every past removal.
 8. **Check REST API schema files** — `*.schema.json` under `integration/`.
 
+**Every zero needs a control.** A grep that finds nothing proves nothing until the same command has found something in the same run: a wrong path, a missing `modules/` prefix or a mistyped flag all print "no matches". Before reading any zero as clean, run the identical command and path set for a **kept** LOB (its control pattern is in the context file's Kept lines) and confirm it is **non-zero**. If the control reads zero, the scan is broken, not the repo clean: fix the scan and rerun the whole sweep. Report every zero together with its control count. If no LOB is being kept, use a string you know is present in the same files, such as a platform typelist name.
+
+Then answer every question in [references/known-answer-checklist.md](references/known-answer-checklist.md). Each must be YES; a NO is a finding.
+
 Any remaining hits are cleaned up. Then re-run the sweep. Only when the sweep returns ZERO customer-owned hits is the verification phase complete.
 
 ### Step 3: Compile and Server Gates
 
-1. **Delete H2 database** — `tmp/pc.mv.db` and `tmp/pc.lock.db`.
+1. **Delete the H2 database** — `<config_root>/tmp/pc.mv.db` and `<config_root>/tmp/pc.lock.db`. The server opens the file named by `jdbc-url` in `<config_root>/config/database-config.xml`, so confirm that path first. Deleting a same-named file in another `tmp/` folder leaves the server's database in place, and the same error comes back.
 2. **Run `gwb clean`**
 3. **Run `gwb codegen`** — must succeed with zero errors.
 4. **Run `gwb compile`** — must succeed with zero errors. If errors found:
@@ -240,8 +258,14 @@ Any remaining hits are cleaned up. Then re-run the sweep. Only when the sweep re
    - `ClassNotFoundException` → check rule `order.txt` entries
    - `Invalid typelist` → check API schema files
    - H2 errors → delete H2 and restart
-6. **Run final grep sweep** — fixes can introduce new orphans.
+6. **Run final grep sweep** — fixes can introduce new orphans. Include its control and the known-answer checklist.
 7. **Only declare LOB removal complete** when: compile is clean, server starts, AND final sweep shows zero LOB references in customer-owned files.
+
+### Step 4: Evaluate the Run (optional, separate session)
+
+To grade a finished removal from outside, use [references/evaluation.md](references/evaluation.md) and `scripts/eval-census.sh`. The baseline census is the one step that is hard to recover later, so offer it in Phase 1, before any edit. The result census and the comparison run in a fresh session that does not reuse this run's name list.
+
+To test the kit itself without a PolicyCenter install, run it on the fixture project described in [evals/README.md](evals/README.md): a fake project with a made-up LOB, traps, and a scorer.
 
 ---
 
@@ -257,9 +281,10 @@ When generating the plan from the template:
    - The LOB code and confirmed alternate names/prefixes.
    - The specific files or directories to work on (from the discovery phase).
    - Exit criteria that must be met.
+   - The path to the context file (agents read it for the config root, confirmed names and inventory).
    - Do NOT repeat Iron Rules or LOB Removal Protocol — the agent `.md` system prompt already has them.
-6. Log all actions to `.pwc/agent/work-logs` following the format defined in `resources/log-format-spec.md`. Every action must be tagged with a category and outcome. The fallout summary section must be built incrementally.
-7. Before troubleshooting any issues, check `.pwc/agent/lessons` AND `resources/lob-removal-lessons.md` for known solutions.
+6. Log all actions to `.pwc/agent/work-logs` following the format defined in `references/log-format-spec.md`. Every action must be tagged with a category and outcome. The fallout summary section must be built incrementally.
+7. Before troubleshooting any issues, check `.pwc/agent/lessons` AND `references/lob-removal-lessons.md` for known solutions.
 8. LOB code matching is case insensitive, but grep patterns should cover both cases.
 9. When dispatching subagents, identify shared files (display.properties, CommonConstants_Ext.gs, UnderwriterEvaluatorTriggeringPoint_Ext.gs) and ensure only ONE agent touches each shared file at a time. Tell each agent which files are off-limits.
 10. After each subagent completes, verify its work before dispatching the next phase — do not trust self-reporting.
@@ -271,10 +296,14 @@ When generating the plan from the template:
 ### How Agent Delegation Works
 
 When you call `Agent(subagent_type: "gw-gosu-agent", prompt: "...")`, Claude Code:
-1. Finds the `.md` file whose `name:` frontmatter matches `gw-gosu-agent` (discovered recursively under `.claude/`)
+1. Finds the `.md` file in `.claude/agents/` whose `name:` frontmatter matches `gw-gosu-agent`
 2. Loads the `.md` body (everything after the YAML `---` block) as the subagent's **system prompt**
 3. Applies the `tools:` and `model:` from the frontmatter
 4. Delivers your `prompt` as the first user message
+
+The agent cannot start other agents. When its work needs another agent, it ends its reply with a **Handoff** block (target agent, files, change needed). Dispatch each Handoff yourself, sequentially, respecting Rule 4 (no parallel edits to shared files).
+
+Every agent ends its reply with a status word. Use it to route, then verify the work yourself (Behavioral Rule 10): `DONE` → verify, then continue; `NEEDS-GOSU` / `NEEDS-PCF` / `NEEDS-ENTITY` / `NEEDS-TYPELIST` / `NEEDS-BUILD` → dispatch that agent with the Handoff block; `BLOCKED` → stop and ask the user; `NOT-FOUND` (an expected artifact does not exist) and `AMBIGUOUS` (cannot classify as LOB-owned or platform) → stop and ask the user, never guess.
 
 **This means each subagent already has its LOB Removal Protocol rules, delegation boundaries, and domain knowledge loaded.** Do NOT repeat the Iron Rules or LOB removal procedures in the task prompt — the agent `.md` already contains them. Task prompts should be concise: LOB code, phase number, specific files/directories to work on, and exit criteria.
 
@@ -282,7 +311,8 @@ When you call `Agent(subagent_type: "gw-gosu-agent", prompt: "...")`, Claude Cod
 ```
 Phase 5: Remove CR7 references from shared Gosu files.
 LOB code: CR7. Alternate names: Crime.
-Project root: C:\IS_APPS\MERGED-PC\PC\modules\configuration
+Config root: <config_root>
+Context file: .pwc/agent/plans/lob-removal-CR7-context.md
 Files to refactor: [list from discovery phase]
 Exit criteria: zero CR7/Crime references in shared Gosu files, no orphaned syntax.
 ```
@@ -299,25 +329,25 @@ Check UnderwriterEvaluatorTriggeringPoint_Ext.gs...
 
 | Phase | Primary Agent | Notes |
 |-------|--------------|-------|
-| 1. Establish Baseline | gw-planner | Runs `pc-current-state` skill, coordinates build verification |
-| 2. Discovery & Subsystem Tracing | gw-planner + all agents | Each agent searches its domain for LOB references |
+| 1. Establish Baseline | main session | Runs `pc-current-state` skill, coordinates build verification |
+| 2. Discovery & Subsystem Tracing | main session + all agents | Each agent searches its domain for LOB references |
 | 3. Remove LOB PCF Files | gw-pcf-agent | Runs `pcf-find-usages` first, deletes LOB folder/files, cleans broken references |
 | 4. Remove Gosu Files | gw-gosu-agent | Deletes LOB Gosu source folders and files |
 | 5. Refactor Shared Gosu Files | gw-gosu-agent | Removes LOB references from shared files. Consumer-first: grep before every deletion |
 | 6. BizRules Bootstrap Updates | gw-entity-agent | Removes gwrules files and entity references |
-| 7. Update Configuration Files | gw-planner | Coordinates config cleanup — ALL locale variants, ALL properties files |
-| 8. Remove Display Properties | gw-planner | Sweeps ALL properties files including locale variants, schema display, productmodel display |
-| 9. Ratebook Removal | gw-planner | Deletes ratebook folders and SBT zip artifacts |
-| 10. Cleanup API Enablement Config | gw-planner | Removes API YAML files, REST schema references, runs codegen |
+| 7. Update Configuration Files | main session | Coordinates config cleanup — ALL locale variants, ALL properties files |
+| 8. Remove Display Properties | main session | Sweeps ALL properties files including locale variants, schema display, productmodel display |
+| 9. Ratebook Removal | main session | Deletes ratebook folders and SBT zip artifacts |
+| 10. Cleanup API Enablement Config | main session | Removes API YAML files, REST schema references, runs static checks (codegen runs after Phases 11 and 12) |
 | 11. Remove Entity Extensions | gw-entity-agent | Removes entity extension files, runs `entity-find-usages` first |
 | 12. Cleanup Typelists | gw-typelist-agent | Removes typelist entries and files, runs `typelist-find-usages` first |
 | 13. Remove Templates & Test Files | gw-gosu-agent | Removes `.gst` templates, gtest files, mock data, sample data |
 | 14. Handle Fragile Files | gw-gosu-agent | Reads and verifies `UnderwriterEvaluatorTriggeringPoint_Ext.gs`, `EntityMetadataUtil.gs`, `CommonConstants_Ext.gs` |
-| 15. Exhaustive Verification Sweep | gw-planner | Full codebase grep across ALL mandatory search paths. ZERO hits required. |
+| 15. Exhaustive Verification Sweep | main session | Full codebase grep across ALL mandatory search paths. ZERO hits required. |
 | 16. Milestone Check | gw-gosu-agent, gw-pcf-agent | Compile errors resolved, codegen clean |
 | 17. Server Startup Verification | gw-build-agent | Server starts to MULTIUSER, startup errors resolved |
 | 18. GUnit Test Updates | gw-gosu-agent | Fixes broken unit tests |
-| 19. Final Verification Sweep | gw-planner | Post-fix grep sweep — fixes can introduce new orphans |
+| 19. Final Verification Sweep | main session | Post-fix grep sweep — fixes can introduce new orphans |
 
 ---
 
@@ -332,6 +362,8 @@ The generated plan must follow this structure:
 > LOB Code: {{lob_code}}
 > Alternate Names/Prefixes: {{alternate_names}}
 > Project Root: {{project_root}}
+> Config Root: {{config_root}}
+> Approval Mode: {{approval_mode}}
 
 ## Overview
 
@@ -372,13 +404,13 @@ ZERO LOB remnants remain in customer-owned files.
 
 ## Behavioral Rules
 
-1. **Never execute removal tasks without user approval.** This skill generates the plan — execution requires explicit approval at each phase boundary.
+1. **Never edit or delete project files before the plan is approved.** Phases 1–2 only read the project (and build it); the user approves the plan and the inventory after Phase 2. After that, the approval mode decides where the run waits (see Approval Modes).
 2. **Always confirm the LOB code, ALL alternate names, AND all related prefixes** before generating the plan.
 3. **Preserve the sequential ordering** of phases. Later phases depend on earlier phases completing successfully.
-4. **Exit criteria are mandatory checkpoints.** No phase proceeds until its exit criteria are verified and the user confirms.
+4. **Exit criteria are mandatory checkpoints.** No phase proceeds until its exit criteria are verified and logged; where the approval mode says so, the user also confirms.
 5. **Log everything.** Every file removed, added, or modified must be recorded with category and outcome.
-6. **Check lessons learned first.** Before troubleshooting, consult `.pwc/agent/lessons` AND `resources/lob-removal-lessons.md`.
-7. **User confirmation model:** Once the user approves the plan and says "go", execute ALL phases continuously without stopping to ask at each boundary. Only stop to ask the user when: (a) an unexpected error occurs, (b) a decision is needed that the plan doesn't cover, or (c) the user explicitly asked for phase-by-phase approval. Report progress as you go but keep moving.
+6. **Check lessons learned first.** Before troubleshooting, consult `.pwc/agent/lessons` AND `references/lob-removal-lessons.md`.
+7. **User confirmation model:** follow the approval mode chosen at the start (see Approval Modes). In every mode, stop for the stops that no mode can skip. Report progress as you go; between stops, keep moving.
 8. **Consumer-first deletion is non-negotiable.** Every agent must grep for consumers before deleting any definition. No exceptions.
 9. **The exhaustive verification sweep is mandatory.** It cannot be skipped, shortened, or declared "probably fine." Every path in the Mandatory Search Scope must be searched.
 10. **Never trust agent self-reporting.** The agent declaring a phase "complete" does not mean it is complete. The verification sweep is the source of truth.

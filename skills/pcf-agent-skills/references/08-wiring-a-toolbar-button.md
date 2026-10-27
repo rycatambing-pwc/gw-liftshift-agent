@@ -19,7 +19,7 @@ Step-by-step recipe for adding a new ToolbarButton that executes a Gosu action. 
    | Custom page-level action | Screen-level toolbar |
    | Custom action on a specific panel | PanelRef-wrapped toolbar (injected via PanelRef child) |
 
-   See `/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`.
+   See `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`.
 
 2. **Add the ToolbarButton element:**
 
@@ -106,7 +106,7 @@ Step-by-step recipe for adding a new ToolbarButton that executes a Gosu action. 
 
 ## Cross-references
 
-- Toolbar placement rules: `/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
-- Naming: `/rules/pcf-agent-rules/01-naming-and-organization.md`
-- PanelRef wrapping: `/context/pcf/05-shared-sections-and-modes.md`
-- Navigation actions: `/context/pcf/13-navigating-to-locations.md`
+- Toolbar placement rules: `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
+- Naming: `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`
+- PanelRef wrapping: `.claude/context/pcf/05-shared-sections-and-modes.md`
+- Navigation actions: `.claude/context/pcf/13-navigating-to-locations.md`

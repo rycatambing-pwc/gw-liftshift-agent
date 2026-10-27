@@ -1,3 +1,8 @@
+---
+name: pc-current-state
+description: Captures a snapshot of the local Guidewire PolicyCenter development environment (tooling, paths, configuration and build state) and writes it to env-description.md in the project root. Use at the start of build work, when gw-build-agent finds no env-description.md, or when asked to compare the environment with the last snapshot.
+---
+
 # Skill: pc-current-state
 
 ## Purpose
@@ -14,7 +19,7 @@ Build a comprehensive snapshot of the Guidewire PolicyCenter development environ
 
 ## Workflow
 
-Execute the following three phases in order. Collect all findings, then write (or update) `env-description.md` in the project root (`C:\dev\policycenter\env-description.md`).
+Execute the following three phases in order. Collect all findings, then write (or update) `env-description.md` in the project root (the directory containing `gwb.bat`).
 
 ### Phase 1 — Environment Description
 
@@ -25,7 +30,7 @@ Gather the following using shell commands:
 | OS version | `[System.Environment]::OSVersion` | Windows version and build |
 | Hostname | `hostname` | Machine identifier |
 | Current user | `whoami` | Running identity |
-| Working directory | `Get-Location` | Should be `C:\dev\policycenter` |
+| Working directory | `Get-Location` | Should be the project root (contains `gwb.bat`) |
 | Available RAM | `(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory` | Total physical memory |
 | Available disk | `Get-PSDrive C` | Free space on the project drive |
 | Shell | `$PSVersionTable` | PowerShell edition and version |
@@ -37,7 +42,7 @@ Check that each required tool is installed and accessible. For each tool, record
 | Tool | Version Check | Environment Variable | Notes |
 |------|---------------|---------------------|-------|
 | Java (JDK) | `java -version` | `JAVA_HOME`, `JAVA11_HOME`, `JAVA11_AMD64_HOME` | Must be JDK 11 or 17 |
-| gwb (Gradle wrapper) | Locate `C:\dev\policycenter\gwb.bat` | — | This IS the Gradle wrapper (no separate `gradlew`) |
+| gwb (Gradle wrapper) | Locate `<project root>\gwb.bat` | — | This IS the Gradle wrapper (no separate `gradlew`) |
 | Bundled Gradle | Check `gradle\wrapper\gradle-wrapper.jar` exists | — | Must be version 8.6 |
 | Git | `git --version` | — | — |
 | Node.js (if applicable) | `node --version` | — | Optional |
@@ -87,190 +92,15 @@ Read and summarize the key configuration files. Report whether each file exists 
 | `--no-daemon` | No persistent Gradle daemon |
 | `-Dgradle.user.home=%APP_HOME%\gradle\cache` | Keeps Gradle caches local to project |
 
-### Default Task
+### Other gwb options, tasks and plugins
 
-If `gwb` is invoked with **no arguments**, it runs `gwTasks` — a custom task that prints the curated list of developer-facing tasks.
-
-### Additional Gradle CLI Options
-
-Since gwb wraps Gradle, all standard Gradle CLI options can be passed:
-
-| Option | Purpose |
-|--------|---------|
-| `-q` | Quiet mode (minimal output) |
-| `-x <task>` | Exclude a task (e.g., `-x compile`) |
-| `-D<property>=<value>` | Set system property |
-| `--info` | Info-level logging |
-| `--debug` | Debug-level logging (very verbose) |
-| `--scan` | Generate build scan |
-| `--warning-mode all` | Show deprecation warnings |
-| `help --task <name>` | Detailed help for a specific task |
-
-### Guidewire-Specific System Properties
-
-| Property | Task | Purpose |
-|----------|------|---------|
-| `-DincludeGtest=true` | compile | Include gtest sources |
-| `-Dgw.port=<port>` | runServer | Override server port |
-| `-Dgw.webapp.dir=<dir>` | runServer | Override webapp directory |
-| `-Dinput_dir`, `-Doutput_dir`, `-Dmap_coverages`, `-Dcc_app_version` | ccTypelistGen | Typelist export params |
-| `-Dexport.file`, `-Dexport.language` | exportLocalizations | Export params |
-| `-Dimport.file`, `-Dimport.language` | importLocalizations | Import params |
-| `-Dmerge.module` | mergeModule | Module to merge |
-| `-DoutputFile`, `-Dexclude`, `-DappRootDirectory` | zipChangedConfig | Archive params |
-| `-DoutputFormat=xml` | genDataDictionary | Output format |
-| `-Ddeprecated=true` | genJavaApi | Include deprecated API |
-| `-Dsplit=true` | genDataMapping | Split output |
-| `-Dresource.types=<types>` | verifyResources | Resource types to check |
-
----
-
-## Available Gradle Tasks
-
-### Core Application Tasks
-
-| Task | Description |
-|------|-------------|
-| `clean` | Delete the build directories |
-| `cleanIdea` | Delete Studio project files (.iml, .idea) |
-| `codegen` | Generate entities, PCFs, permissions, and other sources |
-| `compile` | Compile Java + Gosu sources, re-generate sources, prepare webapp |
-| `dropDb` | Drop all database tables (depends on compile) |
-| `idea` | Generate Studio project files |
-| `inspect` | Run Guidewire Studio Inspections (depends on idea) |
-| `runServer` | Start the Guidewire application server (depends on compile) |
-| `stopServer` | Stop a running application server |
-| `studio` | Start Guidewire Studio (depends on idea + syncUpgradePlugins) |
-| `version` | Print build/version information |
-
-### Codegen Sub-Tasks (called individually or via `codegen`)
-
-| Task | Description |
-|------|-------------|
-| `genEntitySources` | Generate entity source code |
-| `genPcfSources` | Generate PCF source code |
-| `genPermissionSources` | Generate permission source code |
-| `genProductModelSources` | Generate product model source code |
-| `genXmlSources` | Generate XML source code |
-| `genSchemaSources` | Generate schema sources |
-| `genWsdlSources` | Generate WSDL sources |
-| `genLocalizationSources` | Generate localization sources |
-
-### WAR/EAR Packaging Tasks
-
-| Task | Description |
-|------|-------------|
-| `warTomcatDbcp` | WAR for Tomcat with JDBC drivers |
-| `warTomcatJndi` | WAR for Tomcat without JDBC drivers |
-| `warJbossDbcp` | WAR for JBoss with JDBC drivers |
-| `warJbossJndi` | WAR for JBoss without JDBC drivers |
-| `earWeblogicDbcp` | EAR for WebLogic with JDBC drivers |
-| `earWeblogicJndi` | EAR for WebLogic without JDBC drivers |
-| `earWebsphereDbcp` | EAR for WebSphere with JDBC drivers |
-| `earWebsphereJndi` | EAR for WebSphere without JDBC drivers |
-
-### Globalization Tasks
-
-| Task | Description |
-|------|-------------|
-| `diffDisplayKeys` | Generate missing display keys |
-| `exportLocalizations` | Export localizations |
-| `importLocalizations` | Import localized resources |
-
-### Integration Tasks
-
-| Task | Description |
-|------|-------------|
-| `exportWsdl` | Export WSDL for WSI web services |
-| `genExternalSchemas` | Generate external JSON/Swagger/XSD schemas |
-| `genFromWsc` | Build WSC meta-information from .wsc files |
-| `genWsiLocal` | Generate WSDL in gsrc/wsi/local |
-| `jsonSchemaCodegen` | Generate code for JSON schemas (no compile dependency) |
-| `restEndpointGenerator` | Bootstrap Cloud API Endpoints for custom entities |
-| `updateReleasedSchemaVersions` | Update versioned schema versions |
-
-### Documentation Tasks
-
-| Task | Description |
-|------|-------------|
-| `genDataDictionary` | Build Data Dictionary and Security Dictionary |
-| `genEntityModelXml` | Generate entity model in XML format |
-
-### Configuration & Utility Tasks
-
-| Task | Description |
-|------|-------------|
-| `ccTypelistGen` | Export PC product model as typelists to ClaimCenter |
-| `genDataMapping` | Build data mapping files |
-| `genImportAdminDataXsd` | Regenerate XSD files for admin data import |
-| `genPcfMapping` | Build PCF mappings |
-| `genPhoneMetadata` | Regenerate phone metadata |
-| `mergeModule` | Merge configuration module on top of 'configuration' |
-| `packageSolr` | Regenerate Solr zip file |
-| `runSuite` | Run test suite |
-| `verifyExtConfig` | Verify external property substitution |
-| `verifyResources` | Check PCF, Annotation, GxModel, RestIView, Workflow, Types |
-| `zipChangedConfig` | Archive changed configuration files |
-| `flattenConfiguration` | Flatten configuration (no compile dependency) |
-| `genExternalEntitySources` | Generate external entity sources (no compile dependency) |
-
-### Configuration Upgrade Tasks
-
-| Task | Description |
-|------|-------------|
-| `compareConfigs` | Compares two InsuranceSuite configs for upgrade |
-| `genRuleReport` | Build the rule repository report |
-
-### Plugin Development Tasks
-
-| Task | Description |
-|------|-------------|
-| `genJavaApi` | Build the Java API toolkit |
-
-### Cloud Rating Tasks
-
-| Task | Description |
-|------|-------------|
-| `generateCloudRatingCustomRateFunctionZip` | Zip cloud rating custom functions |
-| `deleteCloudRatingCustomRateFunctionZip` | Delete cloud rating custom function zip |
-| `ratePlanStudioSetup` | Download Rateplan JARs from Artifactory |
-
----
-
-## Applied Plugins
-
-| Plugin | Purpose |
-|--------|---------|
-| `com.guidewire.application` | Core app configuration (appCode, port) |
-| `com.guidewire.cust-dist-studio` | Guidewire Studio IDE integration |
-| `com.guidewire.cust-dist-root-tasks` | Root-level task definitions (gwTasks, etc.) |
-| `com.guidewire.cust-dist-dev-tasks` | Developer tasks (runServer, dropDb, etc.) |
-| `com.guidewire.cust-dist-upgrade` | Configuration upgrade tools |
-| `com.guidewire.cust-dist-webapp` | WAR/EAR packaging |
-| `com.guidewire.cust-dist-java-api` | Java API generation |
-| `com.guidewire.customer-dist-test` | Test suite support |
-| `com.guidewire.cust-dist-gosu` | Gosu language compilation |
-| `com.guidewire.cust-dist-deprecated-tasks` | Legacy task name aliases |
-| `com.guidewire.codegen-entity` | Entity source code generation |
-| `com.guidewire.codegen-pcf` | PCF source code generation |
-| `com.guidewire.codegen-xml` | XML/Schema/WSDL code generation |
-| `com.guidewire.codegen-product-model` | Product model code generation |
-| `com.guidewire.codegen-localization` | Localization code generation |
-| `com.guidewire.codegen-permission` | Permission code generation |
-| `com.guidewire.solr-cust-dist-task` | Solr packaging |
-| `com.guidewire.web.utilities` | Web resource (CSS/JS) processing |
-| `com.guidewire.parallel-clean` | Parallel directory cleanup |
-| `com.guidewire.jdbc-drivers` | JDBC driver management |
-| `com.guidewire.dependencies` | Dependency management (BOM import) |
-| `com.guidewire.idea` | IntelliJ IDEA project generation |
-| `com.guidewire.restclient:codegen` | REST client code generation |
-| `com.guidewire.restclient:plugin` | REST client Gradle plugin |
+The default task, extra Gradle CLI options, Guidewire-specific `-D` properties, the full list of Gradle tasks and the applied plugins are in [references/gwb-and-gradle-reference.md](references/gwb-and-gradle-reference.md). A normal snapshot does not need them; read that file only when asked what a `gwb` option, task or plugin does.
 
 ---
 
 ## Output Format
 
-Write (or overwrite) the file `env-description.md` in the Guidewire PolicyCenter home folder (e.g., `C:\dev\policycenter\env-description.md`). Use the following structure:
+Write (or overwrite) the file `env-description.md` in the Guidewire PolicyCenter home folder (`<project root>\env-description.md`). Use the following structure:
 
 ```markdown
 # PolicyCenter Environment Description

@@ -10,7 +10,7 @@ Use this when the requirement is "clicking on [some field/value] should open [an
 
 ## Steps
 
-1. **Identify the target Popup's PCF name** and what root object/argument it requires (check its `<Require>` declaration — see `/context/05-shared-sections-and-modes.md`).
+1. **Identify the target Popup's PCF name** and what root object/argument it requires (check its `<Require>` declaration — see `.claude/context/pcf/05-shared-sections-and-modes.md`).
 2. **Identify the calling widget** — typically a field, link, or button that should trigger navigation.
 3. **Wire the `action` attribute** on that widget to call `.push()` on the popup's name, passing the required argument:
 
@@ -18,11 +18,11 @@ Use this when the requirement is "clicking on [some field/value] should open [an
 action="SomePopupName.push(theRequiredArgument)"
 ```
 
-(Confirmed real-code pattern — see `/context/13-navigating-to-locations.md` for the sourced example, and `/skills/01-building-a-cardview-summary-panel.md` for a `.push()` call in context.)
+(Confirmed real-code pattern — see `.claude/context/pcf/13-navigating-to-locations.md` for the sourced example, and `.claude/skills/pcf-agent-skills/references/01-building-a-cardview-summary-panel.md` for a `.push()` call in context.)
 
 4. **Do not re-implement permission checks** already handled inside the target popup, unless the specific requirement calls for an additional, different restriction at the calling site.
 
 ## Cross-references
 
-- `.push()` vs `.go()` — `.push()` is the confirmed method for opening a Popup. `.go()`/`.push()` also relate to Wizard navigation, but that's a separate, product-specific fact — see `/context/13-navigating-to-locations.md` for why these aren't the same rule.
-- Popup's underlying structure (single Screen + "Return to `<Location>`" link) — `/context/03-locations-reference.md`.
+- `.push()` vs `.go()` — `.push()` is the confirmed method for opening a Popup. `.go()`/`.push()` also relate to Wizard navigation, but that's a separate, product-specific fact — see `.claude/context/pcf/13-navigating-to-locations.md` for why these aren't the same rule.
+- Popup's underlying structure (single Screen + "Return to `<Location>`" link) — `.claude/context/pcf/03-locations-reference.md`.

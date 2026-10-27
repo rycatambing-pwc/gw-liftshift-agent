@@ -1,3 +1,8 @@
+---
+name: pcf-find-usages
+description: Finds where a PCF file or element is referenced across the codebase -- PanelRef/InputSetRef consumers, navigation entry points, mode files, display keys and Gosu references. Use before modifying, renaming or deleting a PCF file or element ID, when tracing how users reach a screen, or when investigating broken references. Read-only.
+---
+
 # Skill: PCF Find Usages
 
 Find where a given PCF file or element is referenced across the Guidewire codebase. Use this when you need to understand the impact of a change, locate callers/includers, or trace navigation paths.

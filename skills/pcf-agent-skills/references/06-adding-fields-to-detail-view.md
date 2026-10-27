@@ -57,7 +57,7 @@ Step-by-step recipe for adding one or more new input fields to an existing Detai
               label="displaykey.Web.Contact.PhoneNumber_Ext"
               validationExpression="contact.PhoneNumber_Ext == null or contact.PhoneNumber_Ext.matches(&quot;\\d{10}&quot;) ? null : displaykey.Web.Contact.PhoneNumber_Ext.Invalid"/>
    ```
-   See `/context/pcf/22-validation-expressions.md` — return `null` (valid) or display-key string (invalid).
+   See `.claude/context/pcf/22-validation-expressions.md` — return `null` (valid) or display-key string (invalid).
 
 8. **If the field should trigger reactive updates**, add PostOnChange:
    ```xml
@@ -65,7 +65,7 @@ Step-by-step recipe for adding one or more new input fields to an existing Detai
      <PostOnChange onChange="recalculateTaxRate()"/>
    </RangeInput>
    ```
-   See `/rules/pcf-agent-rules/07-dynamic-ui-practices.md`.
+   See `.claude/rules/pcf-agent-rules/07-dynamic-ui-practices.md`.
 
 ## Things to check before considering this done
 
@@ -78,7 +78,7 @@ Step-by-step recipe for adding one or more new input fields to an existing Detai
 
 ## Cross-references
 
-- Validation: `/context/pcf/22-validation-expressions.md`, `/rules/pcf-agent-rules/09-validation-expressions.md`
-- Naming: `/rules/pcf-agent-rules/01-naming-and-organization.md`
-- PostOnChange: `/context/pcf/17-dynamic-ui-and-post-on-change.md`, `/rules/pcf-agent-rules/07-dynamic-ui-practices.md`
-- Inline vs reusable DV: `/context/pcf/07-detail-views-inline-vs-reusable.md`
+- Validation: `.claude/context/pcf/22-validation-expressions.md`, `.claude/rules/pcf-agent-rules/09-validation-expressions.md`
+- Naming: `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`
+- PostOnChange: `.claude/context/pcf/17-dynamic-ui-and-post-on-change.md`, `.claude/rules/pcf-agent-rules/07-dynamic-ui-practices.md`
+- Inline vs reusable DV: `.claude/context/pcf/07-detail-views-inline-vs-reusable.md`

@@ -1,3 +1,8 @@
+---
+name: gosu-find-usages
+description: Finds where a Gosu class, enhancement, rule or template (.gs/.gsx/.gr/.gst) is referenced across Gosu, PCF, entity and product-model files. Use before modifying, renaming or deleting Gosu code, when tracing compile errors caused by a missing or renamed class, or when checking for dead code. Read-only.
+---
+
 # Skill: gosu-find-usages
 
 Find where a given Gosu file or element is referenced across the Guidewire codebase. Use
@@ -50,6 +55,34 @@ Only search the directories listed below. Do not search `bin/`, `plugins/`,
 
 Always-run phases execute for every target. Conditional phases run only when the stated
 condition is met. **Phase A must always run first.**
+
+---
+
+### Phase routing
+
+Phases are listed in execution order. **Below** means the phase is written out in this file; a link means read that file first, and only when its condition applies. For a rename (Behavioral Rule 11), read all of them.
+
+| Phase | Run when | Where |
+|---|---|---|
+| A — Entity registration scan | Always, and first | below |
+| 1 — Uses / import consumers | Always | below |
+| 2 — Type reference consumers | Always | below |
+| B — Enhancement method-name scan | The target includes a `.gsx` enhancement file | [enhancement-method-scan.md](references/enhancement-method-scan.md) |
+| 3 — Enhancement consumers of this class | The target is a Gosu class or entity type | [class-relationship-phases.md](references/class-relationship-phases.md) |
+| 4 — Subclass / interface / delegate consumers | The target is an interface or abstract base class | [class-relationship-phases.md](references/class-relationship-phases.md) |
+| 5 — PCF embedded Gosu references | Always | below |
+| C — Product model XML script references | `config/resources/productmodel/` exists in the project | [config-string-constant-phases.md](references/config-string-constant-phases.md) |
+| D — String literal and pattern code references | The target is a LOB line entity, or a class is renamed or its package moved | [config-string-constant-phases.md](references/config-string-constant-phases.md) |
+| E — Shared constant ripple scan | A shared constants class holds a named constant for the target LOB code or class name | [config-string-constant-phases.md](references/config-string-constant-phases.md) |
+| 6 — Rule file consumers | Always; report zero results explicitly | below |
+| 7 — Template render callers | The target is a `.gst` file | [template-callers.md](references/template-callers.md) |
+| F — Typelist orphan check | The target LOB owns typelists | [lob-removal-sweeps.md](references/lob-removal-sweeps.md) |
+| G — Display name orphan check | The target LOB owns entity types | [lob-removal-sweeps.md](references/lob-removal-sweeps.md) |
+| H — REST API schema references | The target is a LOB entity, typelist, or type used in REST APIs | [lob-removal-sweeps.md](references/lob-removal-sweeps.md) |
+| I — Locale properties sweep | The target is a LOB entity, typelist, or class with display keys | [lob-removal-sweeps.md](references/lob-removal-sweeps.md) |
+| J — Smoketests and config XML | The target is a LOB entity or typelist | [lob-removal-sweeps.md](references/lob-removal-sweeps.md) |
+
+Each reference file keeps the full steps for its phases, including their own **Run:** condition.
 
 ---
 
@@ -168,106 +201,6 @@ grep -rn 'typeis.*<TargetEntity>' modules/configuration/gsrc/
 
 ---
 
-### Phase B — Enhancement Method-Name Scan
-
-**Run: When target includes a `.gsx` enhancement file**
-
-Enhancement methods and properties are called directly on entity variables. Callers never
-import or reference the enhancement class by name — searching for the class name finds
-nothing. Every `function` and `property get`/`set` in the `.gsx` must be grepped
-individually.
-
-```
-Search pattern: \b<methodOrPropertyName>\b  (one grep per member)
-Search scope:   modules/configuration/gsrc/**/*.gs
-               modules/configuration/gsrc/**/*.gsx
-               modules/configuration/gsrc/**/*.gst
-               modules/configuration/config/web/pcf/**/*.pcf
-               modules/configuration/config/rules/**/*.gr
-```
-
-**Steps:**
-
-1. Open the target `.gsx` and list every `function` and `property get`/`set` name.
-2. Grep each name individually across all scope directories above.
-3. Exclude the `.gsx` file itself — its own declaration is not a caller.
-
-**What to look for:**
-
-- `entity.<enhancedPropertyName>` — PCF or Gosu accessing an enhancement property
-- `variable.<enhancedMethodName>()` — Gosu calling an enhancement method
-- Any hit outside the owning file's directory
-
-**Note:** Enhancement dispatch is static — the declared type of the variable determines
-which enhancement fires, not the runtime type. Flag any caller where the variable is
-declared at a base type rather than the exact enhanced type.
-
-**Example commands:**
-
-```bash
-grep -rn '\b<enhancedPropertyName>\b' modules/configuration/gsrc/
-grep -rn '\b<enhancedPropertyName>\b' modules/configuration/config/web/pcf/
-grep -rn '\b<enhancedPropertyName>\b' modules/configuration/config/rules/
-grep -rn '\b<enhancedMethodName>\b' modules/configuration/gsrc/
-```
-
----
-
-### Phase 3 — Enhancement Consumers of This Class
-
-**Run: When target is a Gosu class or entity type**
-
-Find `.gsx` files that enhance the target type. If the target is removed, these
-enhancement headers fail to compile.
-
-```
-Search pattern: enhancement \w+ : (entity\.)?<ClassName>
-Search scope:   modules/configuration/gsrc/**/*.gsx
-```
-
-**What to look for:**
-
-- `enhancement MyEnhancement_Ext : entity.TargetEntity`
-- `enhancement MyEnhancement : pkg.TargetClass`
-
-**Example commands:**
-
-```bash
-grep -rn 'enhancement.*:\s*entity\.<TargetEntity>' modules/configuration/gsrc/
-grep -rn 'enhancement.*:\s*<pkg>\.<TargetClass>' modules/configuration/gsrc/
-```
-
----
-
-### Phase 4 — Subclass / Interface / Delegate Consumers
-
-**Run: When target is an interface or abstract base class**
-
-Find classes that extend, implement, or delegate to the target.
-
-```
-Search pattern: extends <ClassName>
-               implements <ClassName>
-               delegate \w+ : <ClassName>
-Search scope:   modules/configuration/gsrc/**/*.gs
-```
-
-**What to look for:**
-
-- `class MyImpl extends TargetBase`
-- `class MyImpl implements TargetInterface`
-- `delegate _impl : TargetInterface = new TargetImpl()`
-
-**Example commands:**
-
-```bash
-grep -rn 'extends\s\+<TargetBaseClass>' modules/configuration/gsrc/
-grep -rn 'implements.*<TargetInterface>' modules/configuration/gsrc/
-grep -rn 'delegate.*:\s*<TargetInterface>' modules/configuration/gsrc/
-```
-
----
-
 ### Phase 5 — PCF Embedded Gosu References
 
 **Run: Always**
@@ -292,107 +225,6 @@ Search scope:   modules/configuration/config/web/pcf/**/*.pcf
 ```bash
 grep -rn 'TargetClass' modules/configuration/config/web/pcf/
 grep -rn '<fully.qualified.package>\.' modules/configuration/config/web/pcf/
-```
-
----
-
-### Phase C — Product Model XML Script References
-
-**Run: When `config/resources/productmodel/` exists in the project**
-
-Find coverage pattern XML files that call the target class in `<InitializeScript>` or
-`<AvailabilityScript>` elements. These scripts are not build-validated — a missing class
-only fails at runtime when the product model engine loads the coverage pattern.
-
-```
-Search pattern: <TargetClassName>  inside InitializeScript or AvailabilityScript
-Search scope:   modules/configuration/config/resources/productmodel/**/*.xml
-```
-
-**What to look for:**
-
-- `<InitializeScript>TargetClass.method(coverable)</InitializeScript>`
-- `<AvailabilityScript>TargetClass.isAvailable(line)</AvailabilityScript>`
-
-**Example commands:**
-
-```bash
-grep -rn 'TargetClass' modules/configuration/config/resources/productmodel/
-grep -rn 'InitializeScript\|AvailabilityScript' \
-  modules/configuration/config/resources/productmodel/policylinepatterns/
-```
-
----
-
-### Phase D — String Literal and Pattern Code References
-
-**Run: When target is a LOB line entity, or when a class is being renamed or its package moved**
-
-Find references to the target as a string literal. These produce no compile error when
-stale.
-
-```
-Search pattern: "<LineName>"
-               "<ProductCode>"
-               PatternCode == "<CoveragePatternCode>"
-               \.Code == "<TypecodeString>"
-Search scope:   modules/configuration/gsrc/**/*.gs
-               modules/configuration/gsrc/**/*.gsx
-               modules/configuration/gsrc/**/*.gst
-               modules/configuration/config/rules/**/*.gr
-               modules/configuration/admin/bin/**/*.gsp
-```
-
-**What to look for:**
-
-- `Set.of("<OtherLine>", "<TargetLineName>")` — set literal
-- `"<TargetLineName>" -> "<lobCode>"` — map entry
-- `.compare(Policy#ProductCode, Equals, "<TargetProductCode>")` — query filter
-- `PolicyLinePattern.PublicID == "<TargetLineName>"` — string comparison
-- `elt.PatternCode == "<TargetCoveragePatternCode>"` — coverage pattern code
-- `term.PatternCode == "<TargetCostLayerPatternCode>"` — cost layer pattern code
-
-**Example commands:**
-
-```bash
-grep -rn '"<TargetLineName>"' modules/configuration/gsrc/
-grep -rn '"<TargetLineName>"' modules/configuration/config/rules/
-grep -rn '"<TargetProductCode>"' modules/configuration/gsrc/
-grep -rn 'PatternCode.*==.*"<TargetPatternPrefix>' modules/configuration/gsrc/
-grep -rn '\.Code\s*==\s*"' modules/configuration/gsrc/
-```
-
----
-
-### Phase E — Shared Constant Ripple Scan
-
-**Run: When a shared constants class holds a named constant for the target LOB code or class name**
-
-Every caller of a named constant produces a compile error if that constant is removed.
-
-```
-Search pattern: <ConstantsClass>\.<CONSTANT_NAME>
-Search scope:   modules/configuration/gsrc/**/*.gs
-               modules/configuration/gsrc/**/*.gsx
-```
-
-**Steps:**
-
-1. Find which constants class defines the target value — grep `gsrc/` for the target line
-   name or product code as a string to locate the file that declares it as a named
-   constant.
-2. For each constant found, grep all callers by that constant's field name.
-3. List every caller as a file requiring a companion edit.
-
-**Example commands:**
-
-```bash
-# Step 1 — locate the constants class
-grep -rn '"<TargetLineName>\|<TargetProductCode>"' modules/configuration/gsrc/
-
-# Step 2 — find all callers of the named constant
-grep -n '"<TargetLineName>\|<TargetProductCode>"' modules/configuration/gsrc/<path/to/SharedConstants>.gs
-grep -rn '<SharedConstantsClass>\.<TARGET_CONSTANT_NAME>' modules/configuration/gsrc/
 ```
 
 ---
@@ -427,160 +259,6 @@ grep -rn '\b<TargetClass>\b' modules/configuration/config/rules/
 ```
 
 ---
-
-### Phase 7 — Template Render Callers
-
-**Run: When target is a `.gst` file**
-
-Find callers of `renderToString()` or `render()` on the target template.
-
-```
-Search pattern: <TemplateName>\.renderToString(
-               <TemplateName>\.render(
-Search scope:   modules/configuration/gsrc/**/*.gs
-               modules/configuration/gsrc/**/*.gsx
-               modules/configuration/gsrc/**/*.gst
-```
-
-**Example commands:**
-
-```bash
-grep -rn '\b<TargetTemplateName>\.renderToString(' modules/configuration/gsrc/
-grep -rn '\b<TargetTemplateName>\.render(' modules/configuration/gsrc/
-```
-
----
-
-### Phase F — Typelist Orphan Check
-
-**Run: When the target LOB owns typelists**
-
-Verify no consumers exist outside the LOB-owned directories. If consumers are found, the
-typelist must be retained.
-
-```
-Pattern:       typekey\.<TypelistName>\.TC_\w+
-               \b<TypelistName>\b
-Search scope:  modules/configuration/gsrc/**  (outside lob-owned path)
-               modules/configuration/gsrc/**/*.gst
-               modules/configuration/config/rules/**/*.gr
-               modules/configuration/config/web/pcf/**/*.pcf
-```
-
-**Example commands:**
-
-```bash
-grep -rn 'typekey\.<TargetTypelist>\.TC_' modules/configuration/gsrc/
-grep -rn 'typekey\.<TargetTypelist>\.TC_' modules/configuration/config/rules/
-grep -rn '\b<TargetTypelist>\b' modules/configuration/config/web/pcf/
-grep -rn '\b<TargetTypelist>\b' modules/configuration/gsrc/
-```
-
----
-
-### Phase G — Display Name Orphan Check
-
-**Run: When the target LOB owns entity types**
-
-List `.en` files whose entity type no longer exists after LOB-owned `.eti` files are
-removed.
-
-```
-Search scope:  modules/configuration/config/displaynames/*.en
-               modules/configuration/config/extensions/displayname/*.en
-Pattern:       filename starts with the target LOB prefix
-```
-
-**Example commands:**
-
-```bash
-ls modules/configuration/config/displaynames/<LOBPrefix>*.en
-ls modules/configuration/config/extensions/displayname/<LOBPrefix>*.en
-```
-
-Also check individual `.en` files for LOB entries (e.g., `TerritoryCode.en` had BP7 entries).
-
----
-
-### Phase H — REST API Schema References
-
-**Run: When target is a LOB entity, typelist, or type used in REST APIs**
-
-Find references in REST API schema JSON files. These produce no compile error when
-stale — they fail at server startup.
-
-```
-Search pattern: <TargetClassName> or <TargetTypeName>
-Search scope:   modules/configuration/integration/**/*.schema.json
-               modules/configuration/config/integration/**
-```
-
-`CUPolicyType` and `coverageNameCU_Ext` were both missed in `policyperiod_ext-1.0.schema.json`
-during CU removal, causing server startup failure.
-
-**Example commands:**
-
-```bash
-grep -rn '<TargetClassName>' modules/configuration/integration/
-grep -rn '<TargetClassName>' modules/configuration/config/integration/
-```
-
----
-
-### Phase I — Locale Properties Sweep
-
-**Run: When target is a LOB entity, typelist, or class with display keys**
-
-Search ALL locale variant properties files. During LOB removal, the user manually found
-2,000+ orphaned keys in files that were never searched.
-
-```
-Search scope:
-  modules/configuration/config/locale/display.properties
-  modules/configuration/config/locale/display_en_US.properties
-  modules/configuration/config/locale/display_yy.properties
-  modules/configuration/config/locale/typelist.properties
-  modules/configuration/config/locale/typelist_en_US.properties
-  modules/configuration/config/locale/typelist_yy.properties
-  modules/configuration/config/locale/typelist_es.properties
-  modules/configuration/config/locale/typelist_es_ES.properties
-  modules/configuration/config/locale/productmodel.display.properties
-  modules/configuration/config/locale/schema.display.properties
-  modules/configuration/config/locale/schema.display_en_US_EDG.properties
-  modules/configuration/config/locale/schema.display_en_US_EDG_PH.properties
-```
-
-**Example commands:**
-
-```bash
-grep -n '<TargetClassName>\|<LOBPrefix>' modules/configuration/config/locale/*.properties
-```
-
----
-
-### Phase J — Smoketests and Config XML
-
-**Run: When target is a LOB entity or typelist**
-
-Search paths that are systematically missed:
-
-```
-Search scope:
-  modules/configuration/config/smoketests/typelists.properties
-  modules/configuration/config/smoketests/
-  modules/configuration/config/xml/config.xml
-  modules/configuration/config/statesets/StateSets.xml
-  modules/configuration/config/resources/ResourceContextMap.xml
-```
-
-The `config/smoketests/` directory was missed in EVERY past LOB removal.
-
-**Example commands:**
-
-```bash
-grep -n '<LOBPrefix>' modules/configuration/config/smoketests/typelists.properties
-grep -n '<LOBPrefix>' modules/configuration/config/xml/config.xml
-```
 
 ---
 

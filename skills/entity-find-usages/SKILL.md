@@ -1,3 +1,8 @@
+---
+name: entity-find-usages
+description: Finds every place a Guidewire entity (.eti) is referenced in Gosu source (.gs/.gsx) in a PolicyCenter, BillingCenter or ClaimCenter project. Use before modifying, renaming or removing an entity, or when asked where an entity is used. Read-only.
+---
+
 # Skill: entity-find-usages
 
 ## Purpose

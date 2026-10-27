@@ -1,0 +1,3 @@
+# code	expect	alternation (extended regex, frozen before the run)
+ZQ7	zero	\b(ZQ7|ZephyrQuest)
+KP7	nonzero	\bKP7

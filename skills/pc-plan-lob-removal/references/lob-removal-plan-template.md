@@ -2,22 +2,29 @@
 
 This template drives the phased LOB removal workflow. It was refined from 8 real LOB removals (CP7, CA7, WCM, GL7, CR7, CU, BP7, CPP) where the agent missed 50+ issues the user had to find manually. Every phase, check, and search path below exists because a real failure proved it necessary.
 
-**Before executing any phase, load `resources/lob-removal-lessons.md` for the full catalog of past failures and mitigations.**
+**Before executing any phase, load `references/lob-removal-lessons.md` for the full catalog of past failures and mitigations.**
+
+**`<config_root>`** is the module folder that contains `config/`, `gsrc/` and `gtest/` (`modules/configuration` in a standard layout). It is resolved during discovery and recorded in the context file. Every path below is relative to it unless it says otherwise.
+
+**The file and folder names below come from the project the kit was refined on.** Treat them as examples to verify, not as a fixed list. The Phase 2 inventory in the context file is the authority on what exists in your project; where a name below does not exist, find its equivalent by grep and record it there.
+
+**Hard prohibitions:** the Iron Rules in `references/hard-prohibitions.md` apply to every phase.
 
 ## Workflow
 
 1. Before starting, verify the agent-logs folder exists: `.pwc/agent/work-logs`.
 2. Create a log file: `lob-removal-<LOB_CODE>-<YYYYMMDD>-<HHmmss>.md` following `log-format-spec.md`.
 3. For each action, log a row with: timestamp (UTC ISO 8601), action category (`REMOVED`, `ADDED`, `MODIFIED`, `EXECUTED`, `VERIFIED`, `SKIPPED`, `QUERY`, `ERROR`), outcome (`OK`, `FAIL`, `WARN`, `PENDING`, `N/A`), target file/command, detail, and responsible agent. Append each impacted file to the Fallout Summary incrementally.
-4. Ask the user which LOB code will be removed. Ask for ALL alternate names and prefixes (e.g., CU → "Customer Umbrella", "UMB", "Umbrella"; WCM → "WC7", "WorkersComp", "WC"; CR7 → "Crime", "ConvR"). **Build the complete list of grep patterns from all names/prefixes.**
-5. Check exit criteria at each phase. Log whether met. Once the user has approved the plan and said "go", execute all phases continuously — only stop to ask the user if an unexpected error or decision is needed.
-6. Before troubleshooting, check `.pwc/agent/lessons` AND `resources/lob-removal-lessons.md` for known solutions.
+4. Confirm the LOB code and its alternate names and prefixes with the discovery procedure in SKILL.md (Step 0, item 6): grep first, then let the user pick from real candidates with `AskUserQuestion`. Do not ask an open-ended "what are the alternate names?" question. **Build the complete list of grep patterns from the confirmed names/prefixes.**
+5. Check exit criteria at each phase. Log whether met. Wait for the user only where the approval mode says to (SKILL.md, Approval Modes), and always at the stops no mode can skip. The mode is pinned in the context file.
+6. Before troubleshooting, check `.pwc/agent/lessons` AND `references/lob-removal-lessons.md` for known solutions.
 7. LOB code matching is case insensitive. Use start-boundary grep only: `\b[lob_code]` NOT `\b[lob_code]\b`.
+8. Keep the context file (`.pwc/agent/plans/lob-removal-<LOB_CODE>-context.md`) current: complete it in Phase 2 and update its Progress section at every phase boundary. Pass its path in every agent task prompt.
 
 ## Common Tasks
 
 0. **Environment Setup**
-    - Before opening any terminal, run `pc-init-env.bat` to set JAVA_HOME (JDK 21+) and IDEA_HOME (2024+). If the batch file doesn't exist, create one that sets these variables.
+    - Before opening any terminal, make sure `JAVA_HOME` and `IDEA_HOME` are set for this project; `env-description.md` (from `pc-current-state`) records what the project expects. If the project has an environment script (for example `pc-init-env.bat`), run it. If it has none, set the variables for the session and do not add a file to the project.
 
 ---
 
@@ -27,6 +34,7 @@ This template drives the phased LOB removal workflow. It was refined from 8 real
 
 **Tasks:**
 - [ ] Run skill `pc-current-state`
+- [ ] Offer the baseline census (`scripts/eval-census.sh`, see `references/evaluation.md`). It is optional, and it is the only evaluation step that is hard to recover after edits begin.
 - [ ] Ask the user to disable the APD / Iapd Service Plugin
 - [ ] Open a terminal
 - [ ] Run `gwb clean`
@@ -42,9 +50,12 @@ This template drives the phased LOB removal workflow. It was refined from 8 real
 
 ## Phase 2: Discovery & Subsystem Tracing
 
+> **Approval stop (all modes):** the plan and the inventory are approved here, before any file is edited.
+
 **Intent:** Before deleting ANYTHING, discover EVERYTHING the LOB owns. Past removals missed entire subsystems (WC Dividends: 20+ files, NCCI Integration: 7+ files, Crime Models: 8 files, EPLI Events: multiple files) because this phase was skipped.
 
 **Tasks:**
+- [ ] **Resolve `<config_root>`** and check each path in the Mandatory Search Scope against it. List the paths that do not exist in this project.
 - [ ] **Grep for ALL LOB prefixes** (primary code + all alternates) across ALL paths in the Mandatory Search Scope (see SKILL.md). Use start-boundary patterns.
 - [ ] **Find all LOB entities and typelists** — `.eti`, `.etx`, `.tti`, `.ttx`, `.tix` files.
 - [ ] **For EACH LOB entity found, trace the full dependency chain:**
@@ -63,41 +74,43 @@ This template drives the phased LOB removal workflow. It was refined from 8 real
 - [ ] **Find all LOB product model files** — product model directory.
 - [ ] **Find all LOB configuration registrations** across all mandatory search paths.
 - [ ] **Build the complete inventory** grouped by subsystem. Present to the user for review.
+- [ ] **Write the context file** (`.pwc/agent/plans/lob-removal-<LOB_CODE>-context.md`): config root, confirmed and rejected names, kept lines, approval mode, and the inventory by subsystem.
 
 **Exit Criteria:**
 - Complete inventory produced and reviewed by user
+- Context file written and complete
 - All subsystems identified (not just individual files)
-- User has approved the inventory before proceeding
+- User has approved the plan and the inventory before proceeding
 
 ---
 
 ## Phase 3: Remove LOB PCF Files
 
 **Tasks:**
-- [ ] Run `pcf-find-usages` against ALL PCF files in `configuration/config/web/pcf/line/[lob_code]` to produce a reference map of consumers
+- [ ] Run `pcf-find-usages` against ALL PCF files in `<config_root>/config/web/pcf/line/[lob_code]` to produce a reference map of consumers
 - [ ] Remove or update `PanelRef`/`InputSetRef` elements in base PCFs whose `def` targets a deleted file
 - [ ] Remove `LocationRef` entries in LocationGroup PCFs pointing to deleted LOB pages
 - [ ] Find and delete LOB-specific mode files outside the LOB folder (e.g., in `line/common/`)
 - [ ] Remove LOB entries from shared navigation PCFs (`LineWizardStepSet`, `PolicyMenuItemSet`, etc.)
-- [ ] Delete the folder and its contents: `configuration/config/web/pcf/line/[lob_code]`
-- [ ] Delete the folder: `configuration/config/productmodel/policylinepatterns/<lob>Line`
+- [ ] Delete the folder and its contents: `<config_root>/config/web/pcf/line/[lob_code]`
+- [ ] Delete the folder: `<config_root>/config/productmodel/policylinepatterns/<lob>Line`
 - [ ] Delete files matching: `[lob_code]ManuscriptEndorsementPopup.pcf`
-- [ ] Run `gwb codegen` — expected: no errors
+- [ ] **Static check (no build):** grep `<config_root>` for every deleted PCF file and folder name. Expect zero `def=`, `location=` or `PanelRef`/`InputSetRef`/`LocationRef` hits. Confirm every edited PCF is still well-formed XML. Codegen runs later, after Phases 11–12 and again in Phase 16.
 
 **Exit Criteria:**
 - All PCF deletions completed
 - No broken `PanelRef`, `InputSetRef`, or `LocationRef` references remain in base PCFs
-- `gwb codegen` succeeded
+- Static check returned zero references to deleted PCF files, and every edited PCF parses
 
 ---
 
 ## Phase 4: Remove Gosu Files
 
 **Tasks:**
-- [ ] Delete `configuration/gsrc/gw/lob/[lob_code_lower]/` folder
-- [ ] Delete `configuration/gsrc/gw/cust/lob/[lob_code_lower]/` folder
-- [ ] Delete `configuration/gsrc/ext/lob/[lob_code_lower]/` folder
-- [ ] Delete `configuration/gsrc/gw/ext/sbt/bizrules/builder/[lob_code_lower]/` folder
+- [ ] Delete `<config_root>/gsrc/gw/lob/[lob_code_lower]/` folder
+- [ ] Delete `<config_root>/gsrc/gw/cust/lob/[lob_code_lower]/` folder
+- [ ] Delete `<config_root>/gsrc/ext/lob/[lob_code_lower]/` folder
+- [ ] Delete `<config_root>/gsrc/gw/ext/sbt/bizrules/builder/[lob_code_lower]/` folder
 - [ ] Delete webservice LOB files: `CC[lob_code]*` in `gsrc/gw/webservice/pc/pc5000/ccintegration/lob/`, `pc900/`, `pc910/`
 - [ ] **Grep for any remaining LOB Gosu files** outside these standard paths. Past removals found files in unexpected locations (e.g., `SBTWCClassCodesToOOTB.gs`, `AddressVerificationUIHelper.gs`).
 
@@ -153,7 +166,7 @@ Standard files to refactor:
 ## Phase 6: BizRules Bootstrap Updates
 
 **Tasks:**
-- [ ] Navigate to `configuration/config/import/bizrules/`
+- [ ] Navigate to `<config_root>/config/import/bizrules/`
 - [ ] Find and delete gwrules files with prefix matching [lob_code]
 - [ ] Task the entity-agent to remove [lob_code] references in `AppCritLineOfBusiness.eti`
 - [ ] **Check `config/bizrules/` and `config/gwrules/`** for any remaining LOB references (BP7 had a pre-existing gwrules bootstrap reference that caused BizRules import failure)
@@ -168,13 +181,13 @@ Standard files to refactor:
 ## Phase 7: Update Configuration Files
 
 **Tasks:**
-- [ ] Delete `configuration/config/resources/systables/custom_form_inference.[lob_code].xml`
-- [ ] Delete `configuration/config/resources/systables/[lob_code]-*.xml`
-- [ ] Delete `configuration/config/resources/systables.[lob_code].xml`
+- [ ] Delete `<config_root>/config/resources/systables/custom_form_inference.[lob_code].xml`
+- [ ] Delete `<config_root>/config/resources/systables/[lob_code]-*.xml`
+- [ ] Delete `<config_root>/config/resources/systables.[lob_code].xml`
 - [ ] **Remove LOB registrations from `systables.xml`** — check for entries pointing to deleted files
 - [ ] **Remove LOB registrations from `systables.CUST.xml`** — this file was missed during CU removal, causing `FileNotFoundException`
 - [ ] **Remove LOB registrations from ANY `systables.*.xml` variant** — check ALL of them
-- [ ] Delete `configuration/config/content/submissionintake/Mapping Script_[lob_code]Line.kts`
+- [ ] Delete `<config_root>/config/content/submissionintake/Mapping Script_[lob_code]Line.kts`
 - [ ] **Check `config/xml/config.xml`** for LOB-specific parameters (e.g., `EnableCPDTOParallelRating` was missed for CP7)
 - [ ] **Check `config/statesets/StateSets.xml`** — WCM entries were missed
 - [ ] **Check `config/resources/ResourceContextMap.xml`** — WCM entries were missed
@@ -189,6 +202,8 @@ Standard files to refactor:
 ## Phase 8: Remove Display Properties and Locale Files
 
 **Intent:** This phase was the single biggest source of missed remnants. The user manually found 2,000+ orphaned keys across multiple properties files the agent never searched. EVERY file in this list must be swept.
+
+**Bulk edits:** these files hold hundreds to thousands of keys, so editing key by key is impractical. A bulk deletion here is allowed only under the guarded procedure in `references/hard-prohibitions.md` (Iron Rule 11): dry run with the match count first, key-name matching only, a kept-LOB control count, and the checks right after the edit (`git diff --stat`, no empty files, count dropped by exactly the dry-run number, control unchanged). Do each properties file as its own guarded edit.
 
 **Tasks:**
 
@@ -220,9 +235,9 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 ## Phase 9: Ratebook Removal
 
 **Tasks:**
-- [ ] Delete `configuration/config/content/cust-ratebooks/[lob_code]/` folder
-- [ ] Delete `configuration/config/content/iso-ratebooks/[lob_code]/` folder
-- [ ] Delete `configuration/build/idea/classes/updates/adopted/SBT*[lob_code]*.zip` if it exists
+- [ ] Delete `<config_root>/config/content/cust-ratebooks/[lob_code]/` folder
+- [ ] Delete `<config_root>/config/content/iso-ratebooks/[lob_code]/` folder
+- [ ] Delete `<config_root>/build/idea/classes/updates/adopted/SBT*[lob_code]*.zip` if it exists
 
 **Exit Criteria:**
 - All LOB ratebook folders and SBT artifacts deleted
@@ -232,24 +247,25 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 ## Phase 10: Cleanup API Enablement Config
 
 **Tasks:**
-- [ ] Delete `configuration/config/integration/apis/installedlobs/[lob_code]_ext-1.0.yaml`
-- [ ] Delete `configuration/config/integration/apis/installedlobs/[lob_code]_codegen_config_ext-1.0.yaml`
+- [ ] Delete `<config_root>/config/integration/apis/installedlobs/[lob_code]_ext-1.0.yaml`
+- [ ] Delete `<config_root>/config/integration/apis/installedlobs/[lob_code]_codegen_config_ext-1.0.yaml`
 - [ ] **Grep REST API schema files** (`integration/**/*.schema.json`) for LOB type references — `CUPolicyType` and `coverageNameCU_Ext` were both missed in `policyperiod_ext-1.0.schema.json`
-- [ ] Run `gwb clean`
-- [ ] Run `gwb codegen`
+- [ ] **Static check (no build):** confirm every edited schema and YAML file still parses, and grep `<config_root>` for the deleted API file names. Expect zero hits. Codegen runs after Phases 11–12.
 
 **Exit Criteria:**
 - API YAML files deleted
 - ZERO LOB references in REST API schema files
-- `gwb codegen` succeeded
+- Every edited schema and YAML file parses
 
 ---
 
 ## Phase 11: Remove Entity Extensions
 
+> **Approval stop (checkpoints mode):** wait for the user before starting this phase. It is the first to delete entity and typelist definitions.
+
 **Tasks:**
 - [ ] Run `gwb clean`
-- [ ] Navigate to `configuration/config/extensions/entity/`
+- [ ] Navigate to `<config_root>/config/extensions/entity/`
 - [ ] Run `entity-find-usages` skill against each LOB entity before deletion (to find consumers)
 - [ ] Find entity files matching LOB prefix: `*.eti`, `*.etx`, `*.eix`
 - [ ] Report matches to the user and get approval
@@ -325,6 +341,7 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 
 **Tasks:**
 - [ ] Run a full codebase grep with start-boundary patterns for EVERY LOB prefix (primary code AND all alternates) across ALL paths in the Mandatory Search Scope (see SKILL.md).
+- [ ] **Control first:** run the same grep and path set for a kept LOB (from the context file's Kept lines). It must be non-zero; if it reads zero the scan is broken, so fix it and rerun. Quote every zero with its control count.
 - [ ] Verify ZERO hits in EACH of these specifically (all were missed in past removals):
     - `config/locale/typelist.properties`
     - `config/locale/typelist_en_US.properties`
@@ -348,14 +365,19 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 - [ ] **Report ALL remaining hits** to the user with file path, line number, and match context. Do NOT silently skip any hit.
 - [ ] **Clean up all remaining hits.**
 - [ ] **Re-run the sweep** after cleanup — verify ZERO hits.
+- [ ] **Answer `references/known-answer-checklist.md`.** Every question must be YES. Report each NO as a finding, fix it, and ask again.
 
 **Exit Criteria:**
 - Full codebase grep returns ZERO LOB references in customer-owned files
 - Sweep has been run TWICE — once to find remnants, once to confirm cleanup
+- Every zero was reported with a non-zero control count
+- Known-answer checklist: every answer is YES
 
 ---
 
 ## Phase 16: Milestone Check
+
+> **Approval stop (checkpoints mode):** wait for the user before starting this phase. It is the first full compile after the removal edits.
 
 **Tasks:**
 - [ ] Run `gwb codegen`. If errors:
@@ -379,7 +401,7 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 ## Phase 17: Server Startup Verification
 
 **Tasks:**
-- [ ] Delete H2 database: `tmp/pc.mv.db` and `tmp/pc.lock.db`
+- [ ] Delete the H2 database: `<config_root>/tmp/pc.mv.db` and `<config_root>/tmp/pc.lock.db` (the file named by `jdbc-url` in `<config_root>/config/database-config.xml`; a same-named file in another `tmp/` folder is not the one the server opens)
 - [ ] Run `gwb runServer`
 - [ ] If startup errors, classify and fix:
     - `FileNotFoundException` → check systable registration files (`systables.xml`, `systables.CUST.xml`, ALL variants)
@@ -413,13 +435,17 @@ For EACH properties file below, grep for ALL LOB prefixes (primary + alternates)
 **Intent:** Fixes applied during Phases 16-18 can introduce NEW orphaned references. One last sweep.
 
 **Tasks:**
-- [ ] Run the same full codebase grep from Phase 15
+- [ ] Run the same full codebase grep from Phase 15, with its control (a kept LOB must read non-zero)
+- [ ] Answer `references/known-answer-checklist.md` again; every question must be YES
 - [ ] If any new hits found, clean them up
 - [ ] Verify ZERO hits
 
 **Exit Criteria:**
-- ZERO LOB references in customer-owned files
+- ZERO LOB references in customer-owned files, each zero reported with a non-zero control count
+- Known-answer checklist: every answer is YES
 - LOB removal is COMPLETE
+
+> **Approval stop (checkpoints mode):** final sign-off with the user.
 
 ---
 

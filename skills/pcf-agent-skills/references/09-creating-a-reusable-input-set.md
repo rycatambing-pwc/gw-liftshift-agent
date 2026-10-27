@@ -8,7 +8,7 @@ Step-by-step recipe for extracting a group of related fields into a reusable Inp
 - A set of fields shares the same visibility/editability condition and you want to control it in one place
 - You need partial page refresh performance — InputSets can be re-evaluated independently
 
-## Key constraints (from `/context/pcf/12-input-sets.md`)
+## Key constraints (from `.claude/context/pcf/12-input-sets.md`)
 
 - InputSet MUST be inside a DetailViewPanel (cannot be a direct child of Screen or secondary views)
 - InputSet CANNOT contain `<InputColumn>` — fields go directly inside
@@ -104,7 +104,7 @@ An InputSet is a "fragment" of fields; a DV is a "complete panel." If you need c
 
 ## Cross-references
 
-- InputSet architecture: `/context/pcf/12-input-sets.md`
-- Nesting constraints: `/rules/pcf-agent-rules/03-container-nesting-constraints.md`
-- Code practices (InputSet for DRY): `/rules/pcf-agent-rules/02-code-and-content-practices.md`
-- Naming: `/rules/pcf-agent-rules/01-naming-and-organization.md`
+- InputSet architecture: `.claude/context/pcf/12-input-sets.md`
+- Nesting constraints: `.claude/rules/pcf-agent-rules/03-container-nesting-constraints.md`
+- Code practices (InputSet for DRY): `.claude/rules/pcf-agent-rules/02-code-and-content-practices.md`
+- Naming: `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`

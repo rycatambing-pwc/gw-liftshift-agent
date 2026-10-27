@@ -85,11 +85,11 @@ Each phase is a second-level heading. Within a phase, each action is a table row
 
 | # | Timestamp            | Category   | Outcome | Target                                                        | Detail                                          | Agent            |
 |---|----------------------|------------|---------|---------------------------------------------------------------|--------------------------------------------------|------------------|
-| 1 | 2026-09-08T14:31:05Z | EXECUTED   | OK      | `gwb clean`                                                   | Exit code 0, 12s                                 | gw-planner       |
-| 2 | 2026-09-08T14:31:18Z | EXECUTED   | OK      | `gwb compile`                                                 | Exit code 0, 48s                                 | gw-planner       |
-| 3 | 2026-09-08T14:32:06Z | EXECUTED   | OK      | `gwb runServer`                                               | Server started on port 8180, 38s                 | gw-planner       |
-| 4 | 2026-09-08T14:32:44Z | VERIFIED   | OK      | Exit criteria: baseline established                           | All 3 build commands succeeded                   | gw-planner       |
-| 5 | 2026-09-08T14:32:45Z | QUERY      | N/A     | User confirmation to proceed                                  | User approved                                    | gw-planner       |
+| 1 | 2026-09-08T14:31:05Z | EXECUTED   | OK      | `gwb clean`                                                   | Exit code 0, 12s                                 | main             |
+| 2 | 2026-09-08T14:31:18Z | EXECUTED   | OK      | `gwb compile`                                                 | Exit code 0, 48s                                 | main             |
+| 3 | 2026-09-08T14:32:06Z | EXECUTED   | OK      | `gwb runServer`                                               | Server started on port 8180, 38s                 | main             |
+| 4 | 2026-09-08T14:32:44Z | VERIFIED   | OK      | Exit criteria: baseline established                           | All 3 build commands succeeded                   | main             |
+| 5 | 2026-09-08T14:32:45Z | QUERY      | N/A     | User confirmation to proceed                                  | User approved                                    | main             |
 
 ### Exit Criteria Results
 - [x] `gwb clean` completed successfully
@@ -106,7 +106,7 @@ Each phase is a second-level heading. Within a phase, each action is a table row
 
 **REMOVED — property removal from a shared file:**
 ```
-| 18 | 2026-09-08T15:10:03Z | MODIFIED | OK | `configuration/config/locale/display.properties` | Removed 214 properties matching `*.BP7.*` | gw-planner |
+| 18 | 2026-09-08T15:10:03Z | MODIFIED | OK | `configuration/config/locale/display.properties` | Removed 214 properties matching `*.BP7.*` | main |
 ```
 
 **ADDED — generated plan or patch file:**
@@ -190,12 +190,16 @@ This section aggregates all impacted files across every phase, grouped by action
 
 ## Errors Encountered
 
-| # | Phase | Target                           | Error Summary                             | Resolution            |
-|---|-------|----------------------------------|-------------------------------------------|-----------------------|
-| 1 | 12    | `gwb compile`                    | 3 compile errors — unresolved BP7 symbols | Fixed by gosu-agent   |
+| # | Phase | Target                           | Error Summary                             | Resolution            | Status               |
+|---|-------|----------------------------------|-------------------------------------------|-----------------------|----------------------|
+| 1 | 12    | `gwb compile`                    | 3 compile errors — unresolved BP7 symbols | Fixed by gosu-agent   | RESOLVED 2026-09-08  |
 
-**Total errors: 1 (all resolved)**
+**Total errors: 1 (1 resolved, 0 open)**
 ```
+
+**Fallout ledger rules**
+- Rows are never deleted or rewritten. When an error is fixed, change its Status from `OPEN` to `RESOLVED <date>` and keep the row, so the history stays readable.
+- Status is `OPEN` or `RESOLVED <date>`. Any row still `OPEN` at the end of the run must be explained in the Run Result.
 
 ---
 
@@ -217,7 +221,12 @@ This section aggregates all impacted files across every phase, grouped by action
 | Errors Unresolved    | 0                          |
 | User Queries         | 5                          |
 | Lessons Referenced   | 0                          |
+
+**Accepted leftovers:** none
+<!-- or one line per item: `path` — what still matches a removal code — why the user agreed to keep it -->
 ```
+
+`Errors Unresolved` must equal the number of `OPEN` rows in the fallout ledger. Anything that still matches a removal code at the end of the run, and that the user agreed to keep, is listed under **Accepted leftovers**; nothing else may remain. The evaluation (`evaluation.md`) reads this list.
 
 ---
 

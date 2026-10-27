@@ -103,7 +103,7 @@ Step-by-step recipe for creating a new Popup location. Popups appear on top of t
 
 ## Cross-references
 
-- Popup data flow contracts: `/context/pcf/16-popup-use-cases-and-data-flow.md`
-- Navigation syntax (`.push()`): `/context/pcf/13-navigating-to-locations.md`, `/rules/pcf-agent-rules/06-navigation-syntax.md`
-- Toolbar placement: `/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
-- Naming: `/rules/pcf-agent-rules/01-naming-and-organization.md`
+- Popup data flow contracts: `.claude/context/pcf/16-popup-use-cases-and-data-flow.md`
+- Navigation syntax (`.push()`): `.claude/context/pcf/13-navigating-to-locations.md`, `.claude/rules/pcf-agent-rules/06-navigation-syntax.md`
+- Toolbar placement: `.claude/rules/pcf-agent-rules/04-toolbar-placement-and-edit-workflow.md`
+- Naming: `.claude/rules/pcf-agent-rules/01-naming-and-organization.md`

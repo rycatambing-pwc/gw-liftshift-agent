@@ -4,7 +4,7 @@ Use this when reviewing existing PCF for performance issues, or when writing new
 
 ## Step 1: Spot the Anti-Patterns
 
-Check every non-trivial expression against these four categories (full detail: `/context/19-expensive-expressions.md`):
+Check every non-trivial expression against these four categories (full detail: `.claude/context/pcf/19-expensive-expressions.md`):
 - Complex function calls, especially anything involving a query
 - Multi-step dot notation (each hop across a foreign key is a query)
 - Array expansions (`*.`)
@@ -40,6 +40,6 @@ If you introduced a PCF variable per Step 3, leave `recalculateOnRefresh` at its
 
 ## Cross-references
 
-- Full anti-pattern catalog: `/context/19-expensive-expressions.md`
-- Fix-pattern rules: `/rules/08-performance-expensive-expressions.md`
-- Post-on-Change mechanics: `/context/17-dynamic-ui-and-post-on-change.md`, `/context/18-post-on-change-implementation-and-performance.md`
+- Full anti-pattern catalog: `.claude/context/pcf/19-expensive-expressions.md`
+- Fix-pattern rules: `.claude/rules/pcf-agent-rules/08-performance-expensive-expressions.md`
+- Post-on-Change mechanics: `.claude/context/pcf/17-dynamic-ui-and-post-on-change.md`, `.claude/context/pcf/18-post-on-change-implementation-and-performance.md`

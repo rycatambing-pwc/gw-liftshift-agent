@@ -64,11 +64,11 @@ The user wants a multi-tab ("Card") summary view for an entity — e.g. a contac
 
 ## Rules this pattern must satisfy (cross-reference)
 
-- Every custom file/panel referenced (`EntitySummary_ExtDV`, `RelatedItems_ExtLV`) must follow the `_Ext` + framework-auto-suffix naming convention (`/rules/01-naming-and-organization.md`).
-- All titles/labels use `DisplayKey.get(...)` — never hardcoded text (`/rules/02-code-and-content-practices.md`).
+- Every custom file/panel referenced (`EntitySummary_ExtDV`, `RelatedItems_ExtLV`) must follow the `_Ext` + framework-auto-suffix naming convention (`.claude/rules/pcf-agent-rules/01-naming-and-organization.md`).
+- All titles/labels use `DisplayKey.get(...)` — never hardcoded text (`.claude/rules/pcf-agent-rules/02-code-and-content-practices.md`).
 - Every `Card`, `PanelRef`'s target, and `ToolbarButton` needs a unique, descriptive `id`.
-- `Card` is a **secondary container** — it cannot directly hold atomic widgets, only primary containers (`DetailViewPanel`, `PanelRef`-included views) — consistent with `/context/02-element-hierarchy-and-containers.md`.
+- `Card` is a **secondary container** — it cannot directly hold atomic widgets, only primary containers (`DetailViewPanel`, `PanelRef`-included views) — consistent with `.claude/context/pcf/02-element-hierarchy-and-containers.md`.
 
 ## Open item affecting this skill
 
-`available=` vs `visible=` on `ToolbarButton` — this example uses `available`; earlier sourced material used `visible`. Default to `available` when following this real-code pattern until the distinction is confirmed (see `/unresolved/01-open-questions.md`, item 1b).
+`available=` vs `visible=` on `ToolbarButton` — this example uses `available`; earlier sourced material used `visible`. Default to `available` when following this real-code pattern until the distinction is confirmed (see `.claude/context/pcf/open-questions.md`, item 1b).
