@@ -1,0 +1,119 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Agent Wiring Map" id="agent-wiring-map">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Rules band -->
+        <mxCell id="rules" value="RULES&#10;Auto-loaded into every session in this project — applies regardless of which agent is running" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#DCF1E8;strokeColor=#1F8F6A;fontColor=#14523C;fontFamily=Courier New;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="24" width="1360" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Agent boxes -->
+        <mxCell id="agentBuild" value="AGENT&#10;gw-build-agent&#10;Gradle builds &amp; compile diagnostics" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#FFFFFF;strokeColor=#5B6473;fontFamily=Courier New;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="agentEntity" value="AGENT&#10;gw-entity-agent&#10;Entity XML (.eti/.etx) for ORM codegen" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#FFFFFF;strokeColor=#5B6473;fontFamily=Courier New;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="393" y="140" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="agentPcf" value="AGENT&#10;gw-pcf-agent&#10;PCF UI configuration (screens, views)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#FFFFFF;strokeColor=#5B6473;fontFamily=Courier New;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="746" y="140" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="agentTypelist" value="AGENT&#10;gw-typelist-agent&#10;Typelist codes (.tti/.ttx)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#FFFFFF;strokeColor=#5B6473;fontFamily=Courier New;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1099" y="140" width="300" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Rules -> agents connectors -->
+        <mxCell id="e_rules_build" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=5 4;strokeColor=#1F8F6A;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="rules" target="agentBuild">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_rules_entity" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=5 4;strokeColor=#1F8F6A;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="rules" target="agentEntity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_rules_pcf" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=5 4;strokeColor=#1F8F6A;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="rules" target="agentPcf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_rules_typelist" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=5 4;strokeColor=#1F8F6A;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="rules" target="agentTypelist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Skill boxes -->
+        <mxCell id="skillCurrentState" value="SKILL&#10;pc-current-state&#10;Snapshots dev environment" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=#E3E8FB;strokeColor=#3457C9;fontFamily=Courier New;fontSize=11.5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="90" y="300" width="200" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="skillEntityFind" value="SKILL&#10;entity-find-usages&#10;Documented, never invoked" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=#F7E6D2;strokeColor=#C17324;dashed=1;dashPattern=6 4;fontFamily=Courier New;fontSize=11.5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="443" y="300" width="200" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="skillPcfFind" value="SKILL&#10;pcf-find-usages&#10;Element refs" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=10;fillColor=#E3E8FB;strokeColor=#3457C9;fontFamily=Courier New;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="756" y="300" width="140" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="skillPcfSkills" value="SKILL&#10;pcf-agent-skills&#10;How-to guides" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=10;fillColor=#E3E8FB;strokeColor=#3457C9;fontFamily=Courier New;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="906" y="300" width="140" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="skillNoneTypelist" value="— no skill wired —" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=#9AA3B2;dashed=1;dashPattern=4 4;fontFamily=Helvetica;fontSize=12;fontColor=#5B6473" vertex="1" parent="1">
+          <mxGeometry x="1149" y="300" width="200" height="68" as="geometry" />
+        </mxCell>
+
+        <!-- Agent -> skill arrows -->
+        <mxCell id="e_build_current" style="edgeStyle=none;rounded=0;strokeColor=#3457C9;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="agentBuild" target="skillCurrentState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_entity_find" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=6 4;strokeColor=#C17324;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="agentEntity" target="skillEntityFind">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pcf_find" style="edgeStyle=none;rounded=0;strokeColor=#3457C9;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.3;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="agentPcf" target="skillPcfFind">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pcf_skills" style="edgeStyle=none;rounded=0;strokeColor=#3457C9;strokeWidth=2;endArrow=block;endFill=1;html=1;exitX=0.7;exitY=1;entryX=0.5;entryY=0" edge="1" parent="1" source="agentPcf" target="skillPcfSkills">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Context box + elbow arrow into gw-pcf-agent -->
+        <mxCell id="context" value="CONTEXT&#10;/context/pcf&#10;Pulled on demand — never preloaded" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=none;strokeColor=#9AA3B2;dashed=1;dashPattern=4 4;fontFamily=Courier New;fontSize=11.5;fontStyle=1;fontColor=#5B6473" vertex="1" parent="1">
+          <mxGeometry x="1120" y="390" width="280" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="e_context_pcf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;dashPattern=5 4;strokeColor=#9AA3B2;strokeWidth=1.8;endArrow=block;endFill=1;html=1;exitX=0.5;exitY=0;entryX=0.9;entryY=1" edge="1" parent="1" source="context" target="agentPcf">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1260" y="280" />
+              <mxPoint x="1046" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Orphan row -->
+        <mxCell id="skillGosuFind" value="SKILL&#10;gosu-find-usages&#10;No gosu agent in this scope" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=#F7E6D2;strokeColor=#C17324;dashed=1;dashPattern=6 4;fontFamily=Courier New;fontSize=11.5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="90" y="390" width="260" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="skillLobPlan" value="SKILL&#10;pc-plan-lob-removal&#10;Generates LOB-removal plan" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=#F7E6D2;strokeColor=#C17324;dashed=1;dashPattern=6 4;fontFamily=Courier New;fontSize=11.5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="390" width="260" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="ghostPlanner" value="AGENT (excluded)&#10;gw-planner&#10;No Task tool → can't delegate" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=12;fillColor=none;strokeColor=#9AA3B2;dashed=1;dashPattern=4 4;fontFamily=Courier New;fontSize=11.5;fontStyle=1;fontColor=#5B6473" vertex="1" parent="1">
+          <mxGeometry x="830" y="390" width="250" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="e_lobplan_planner" style="edgeStyle=none;rounded=0;dashed=1;dashPattern=6 4;strokeColor=#C17324;strokeWidth=1.8;endArrow=block;endFill=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5" edge="1" parent="1" source="skillLobPlan" target="ghostPlanner">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legendTitle" value="Legend" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Courier New;fontSize=12;fontStyle=1;fontColor=#5B6473" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendWired" value="Wired — the agent file actually invokes this skill" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=#3457C9" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="360" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendGap" value="Documented, not wired — described but no file calls it" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=#C17324" vertex="1" parent="1">
+          <mxGeometry x="420" y="500" width="380" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendRules" value="Rules — auto-injected for every session, not agent-specific" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=#1F8F6A" vertex="1" parent="1">
+          <mxGeometry x="820" y="500" width="360" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendGhost" value="Context / excluded — on-demand only, or out of scope" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=#5B6473" vertex="1" parent="1">
+          <mxGeometry x="1190" y="500" width="330" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
