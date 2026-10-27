@@ -1,3 +1,7 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Naming and Organization Rules
 
 These are firm conventions, not suggestions — violating them creates upgrade-merge risk or naming collisions with future Guidewire base updates.
@@ -14,17 +18,17 @@ These are firm conventions, not suggestions — violating them creates upgrade-m
 
 - Place custom PCFs in the appropriate existing or custom PCF package/folder.
 - Keep related PCFs together in the same package.
-- Follow the established per-product folder structure (see `/context/06-folder-and-package-structure.md`) — don't invent new top-level folders.
+- Follow the established per-product folder structure (see `.claude/context/pcf/06-folder-and-package-structure.md`) — don't invent new top-level folders.
 
 ## Prefer Modifying Base Files
 
 - Modify existing base configuration files wherever possible.
 - Create new PCF files only when a base file genuinely cannot accommodate the requirement.
-- This minimizes upgrade-merge conflicts and keeps customization surface area small (see MMC principle in `/context/01-pcf-overview.md`).
+- This minimizes upgrade-merge conflicts and keeps customization surface area small (see MMC principle in `.claude/context/pcf/01-pcf-overview.md`).
 
 ## Mode Naming Conventions (three distinct cases)
 
-Full mechanics: `/context/20-modes-dispatch-and-defaults.md`.
+Full mechanics: `.claude/context/pcf/20-modes-dispatch-and-defaults.md`.
 
 1. **Adding a new mode to an existing BASE product PCF** → suffix the **mode name itself** with `_Ext`. Example: `ABAutoRentalAgcy_Ext` as a new mode added to base file `ABCompanyVendorSpecialtyInputSet.pcf`.
 2. **Creating an entirely new modal PCF (a new file)** → suffix the **PCF name** with `_Ext`, inserted before the type suffix — same pattern as the general `_Ext` + auto-appended-type-suffix rule above. Example: `ABGenericVendor_ExtInputSet` (for Input Sets, the appended type suffix is the full word `InputSet`, confirming/resolving the earlier open question about Input Set's auto-suffix — it is not abbreviated like `LV`/`DV`).

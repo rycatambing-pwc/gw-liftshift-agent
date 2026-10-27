@@ -1,6 +1,10 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Container Nesting Constraints
 
-These are structural legality rules, not stylistic preferences — violating them produces invalid PCF. Full conceptual background in `/context/02-element-hierarchy-and-containers.md`.
+These are structural legality rules, not stylistic preferences — violating them produces invalid PCF. Full conceptual background in `.claude/context/pcf/02-element-hierarchy-and-containers.md`.
 
 ## Containment Rules
 
@@ -24,7 +28,7 @@ Detail View and List View are both **primary containers**, and primary container
 - It can be placed anywhere inside a Detail View's `InputColumn`.
 - It can take a **label**, just like a normal atomic widget.
 
-Exact attribute syntax for `ListViewInput` is not yet confirmed from real code — treat the placement rule as confirmed, but verify syntax before generating it. See `/context/08-list-view-architecture.md` and `/unresolved/01-open-questions.md`.
+Exact attribute syntax for `ListViewInput` is not yet confirmed from real code — treat the placement rule as confirmed, but verify syntax before generating it. See `.claude/context/pcf/08-list-view-architecture.md` and `.claude/context/pcf/open-questions.md`.
 
 ## Popup Structural Requirement
 

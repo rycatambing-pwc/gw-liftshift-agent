@@ -1,6 +1,15 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+  - "**/*.pcf"
+---
 # Performance Rules
 
-These rules prevent the most common Gosu performance anti-patterns in Guidewire. Full background: `/context/gosu/queries/07-query-performance-antipatterns.md`, `/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`, `/context/gosu/cross_cutting/14-system-health-profiler-dbcc-and-inspections.md`.
+These rules prevent the most common Gosu performance anti-patterns in Guidewire. Full background: `.claude/context/gosu/queries/07-query-performance-antipatterns.md`, `.claude/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`, `.claude/context/gosu/cross_cutting/14-system-health-profiler-dbcc-and-inspections.md`.
 
 ## Rule: Never Filter In-Memory on DB-Backed Collections
 
@@ -23,7 +32,7 @@ An "expensive expression" in a PCF widget property (multi-step dot path, spread 
 
 **Caution:** do not set `recalculateOnRefresh="true"` on variables that hold expensive values unless absolutely required — doing so defeats the caching benefit on pages with `PostOnChange` fields.
 
-Full mechanics: `/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`.
+Full mechanics: `.claude/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`.
 
 ## Rule: One Shared PCF Variable for Multiple Widgets Using the Same Expensive Method
 

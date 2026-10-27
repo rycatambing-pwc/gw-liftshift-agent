@@ -1,3 +1,13 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+  - "**/*.etx"
+  - "**/*.ttx"
+---
 # Naming and Packages Rules
 
 These are firm conventions, not suggestions — violating them creates namespace collisions with Guidewire base code and breaks upgrade-merge hygiene.
@@ -32,7 +42,7 @@ Use this table to determine where to place customer additions. Never write into 
 - Never place custom code in `gw.*` or `com.guidewire.*` — those namespaces are reserved for Guidewire base product code.
 - Organize sub-packages by feature or domain area, not by layer or file type.
 
-Full guidance: `/context/gosu/oop/11a-naming-and-packages.md`.
+Full guidance: `.claude/context/gosu/oop/11a-naming-and-packages.md`.
 
 ## `_Ext` Suffix — Where It Applies
 

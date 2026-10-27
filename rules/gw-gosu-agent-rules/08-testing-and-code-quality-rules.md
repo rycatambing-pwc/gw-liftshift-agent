@@ -1,6 +1,14 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+---
 # Testing and Code Quality Rules
 
-These rules govern GUnit test structure, logging discipline, and general code quality conventions. Full background: `/context/gosu/cross_cutting/13-gunit-testing.md`, `/context/gosu/cross_cutting/12-logging-and-structured-logger.md`, `/context/gosu/oop/11b-enhancements.md`.
+These rules govern GUnit test structure, logging discipline, and general code quality conventions. Full background: `.claude/context/gosu/cross_cutting/13-gunit-testing.md`, `.claude/context/gosu/cross_cutting/12-logging-and-structured-logger.md`, `.claude/context/gosu/oop/11b-enhancements.md`.
 
 ## GUnit: Tests Must Live in the `gtest` Directory
 
@@ -110,7 +118,7 @@ Gosu enhancements use **static dispatch**: the enhancement method called is dete
 
 This is the opposite of virtual method dispatch. Be explicit about declared types when the correct enhancement behavior depends on subtype specificity.
 
-Full details: `/context/gosu/oop/11b-enhancements.md`.
+Full details: `.claude/context/gosu/oop/11b-enhancements.md`.
 
 ## Rule: Enhancements Are for Cross-Cutting Entity Behavior — Not Narrow UI Logic
 

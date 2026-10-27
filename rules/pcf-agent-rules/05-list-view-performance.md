@@ -1,6 +1,10 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # List View Performance Practices
 
-Source: Guidewire Education module (View Entities). Full conceptual background in `/context/10-view-entities-and-performance.md`.
+Source: Guidewire Education module (View Entities). Full conceptual background in `.claude/context/pcf/10-view-entities-and-performance.md`.
 
 ## Rule: Don't Retrieve a Full Related Entity for One Field
 
@@ -23,4 +27,4 @@ When adding filtering to a query-backed List View:
 - For anything beyond a trivial filter expression, put the logic in a **Gosu function** and call it from the filter property — don't inline complex logic directly.
 - Use **comparison clauses in the Gosu query itself** to limit the result set at the database level, rather than fetching everything and filtering afterward.
 
-Full mechanics in `/context/11-list-view-filtering.md`.
+Full mechanics in `.claude/context/pcf/11-list-view-filtering.md`.

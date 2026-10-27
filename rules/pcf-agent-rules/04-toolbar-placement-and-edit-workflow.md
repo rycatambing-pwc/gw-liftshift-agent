@@ -1,3 +1,7 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Toolbar Placement Rules and the Edit/Update/Cancel Workflow
 
 Source: Guidewire Education module (Detail Views lesson).
@@ -16,7 +20,7 @@ A toolbar is a row of widgets associated with a container widget, letting the us
 
 **Rule:** if you need toolbar-driven actions in the context of an Input Set's data, don't attach a toolbar to the Input Set itself — an Input Set is normally referenced/placed inside an `InputColumn` within a `Detail View Panel`, so put the toolbar on the enclosing Detail View Panel (or the `PanelRef` that includes it) instead.
 
-(Cross-reference: this is also consistent with the confirmed real-code pattern in `/skills/01-building-a-cardview-summary-panel.md`, where a `<Toolbar>` is nested directly inside a `<PanelRef>`.)
+(Cross-reference: this is also consistent with the confirmed real-code pattern in `.claude/skills/pcf-agent-skills/references/01-building-a-cardview-summary-panel.md`, where a `<Toolbar>` is nested directly inside a `<PanelRef>`.)
 
 ## The Standard Edit / Update / Cancel State Machine
 
@@ -32,7 +36,7 @@ This is the default behavior for a toolbar-driven edit workflow on a data-backed
 
 ## Editable List View: Add/Remove Button Rules
 
-For a List View made editable with Add/Remove (iterator) buttons — see full detail in `/context/09-list-view-editability.md`:
+For a List View made editable with Add/Remove (iterator) buttons — see full detail in `.claude/context/pcf/09-list-view-editability.md`:
 
 | Rule | Detail |
 |---|---|
@@ -42,4 +46,4 @@ For a List View made editable with Add/Remove (iterator) buttons — see full de
 
 **Toolbar placement recommendation:** Edit button → screen-level toolbar; Add/Remove buttons → the toolbar closest to the List View itself (may collapse into one toolbar on simpler screens — acceptable, not a violation).
 
-**Add button pattern choice:** if the List View's visible columns cover everything needed at creation, insert a new empty row directly (edit in place). If the object has fields not shown in the List View, use a creation popup instead (mechanics not yet documented — see `/unresolved/01-open-questions.md`).
+**Add button pattern choice:** if the List View's visible columns cover everything needed at creation, insert a new empty row directly (edit in place). If the object has fields not shown in the List View, use a creation popup instead (mechanics not yet documented — see `.claude/context/pcf/open-questions.md`).

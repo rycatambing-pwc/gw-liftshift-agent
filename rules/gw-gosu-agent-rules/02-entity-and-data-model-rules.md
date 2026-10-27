@@ -1,6 +1,20 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+  - "**/*.eti"
+  - "**/*.etx"
+  - "**/*.eix"
+  - "**/*.tti"
+  - "**/*.ttx"
+  - "**/*.tix"
+---
 # Entity and Data Model Rules
 
-These are correctness rules, not style preferences — violating them causes data corruption, silent failures, or runtime exceptions. Full background: `/context/gosu/platform/04-data-model-entity-metadata-and-typelists.md`.
+These are correctness rules, not style preferences — violating them causes data corruption, silent failures, or runtime exceptions. Full background: `.claude/context/gosu/platform/04-data-model-entity-metadata-and-typelists.md`.
 
 ## Platform-Owned Metadata Files Are Read-Only
 

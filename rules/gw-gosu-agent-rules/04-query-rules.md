@@ -1,6 +1,14 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+---
 # Query Rules
 
-These rules enforce correct and performant use of the Guidewire Query API. Violating them causes excessive database load, connection pool exhaustion, or incorrect results. Full background: `/context/gosu/queries/06-query-pattern-cards.md`, `/context/gosu/queries/07-query-performance-antipatterns.md`, `/context/gosu/queries/30-db-connection-pool.md`.
+These rules enforce correct and performant use of the Guidewire Query API. Violating them causes excessive database load, connection pool exhaustion, or incorrect results. Full background: `.claude/context/gosu/queries/06-query-pattern-cards.md`, `.claude/context/gosu/queries/07-query-performance-antipatterns.md`, `.claude/context/gosu/queries/30-db-connection-pool.md`.
 
 ## Rule: Never Filter After `select()` — Push Predicates Into the Query
 
@@ -62,7 +70,7 @@ A web service method that issues multiple sequential queries can exhaust the con
 
 **Do not** use this pattern for single-query operations or inside long-running processes — it holds a connection open for the entire block duration.
 
-Full mechanics: `/context/gosu/queries/30-db-connection-pool.md`.
+Full mechanics: `.claude/context/gosu/queries/30-db-connection-pool.md`.
 
 ## Rule: Do Not Use `contains()` as a Case-Insensitive Substring Check
 

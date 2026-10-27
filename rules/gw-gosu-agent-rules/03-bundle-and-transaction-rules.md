@@ -1,6 +1,14 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+---
 # Bundle and Transaction Rules
 
-These are correctness rules — violating them produces silent data loss, entity state detachment, or incorrect persistence behavior. Full background: `/context/gosu/platform/10-bundles-and-transactions.md`.
+These are correctness rules — violating them produces silent data loss, entity state detachment, or incorrect persistence behavior. Full background: `.claude/context/gosu/platform/10-bundles-and-transactions.md`.
 
 ## Rule: Save the Return Value of `bundle.add()`
 

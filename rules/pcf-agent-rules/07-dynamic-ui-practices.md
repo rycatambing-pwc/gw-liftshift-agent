@@ -1,6 +1,10 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Dynamic UI: Choosing Properties vs. Post-on-Change
 
-Full background: `/context/17-dynamic-ui-and-post-on-change.md`.
+Full background: `.claude/context/pcf/17-dynamic-ui-and-post-on-change.md`.
 
 ## Rule: Don't Force a Commit Cycle for Purely Reactive UI
 

@@ -1,3 +1,7 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Code and Content Practices
 
 ## Minimize Gosu in `<Code>` Blocks
@@ -25,11 +29,11 @@ Be aware that any element both you and Guidewire can modify creates merge comple
 
 If multiple widgets need the same `visible` or `editable` condition — especially if that same group of widgets appears in more than one place (e.g. two different Cards) — group them into an **Input Set** and set the condition once on the Input Set itself, rather than repeating it on every individual widget in every location.
 
-Benefits: one place to update layout/order changes, one place to update the shared condition, and (per `/context/12-input-sets.md`) a performance advantage for partial/dynamic page updates since the Input Set's content can be refreshed as a single unit.
+Benefits: one place to update layout/order changes, one place to update the shared condition, and (per `.claude/context/pcf/12-input-sets.md`) a performance advantage for partial/dynamic page updates since the Input Set's content can be refreshed as a single unit.
 
 ## Choosing Between Data Model Validation and UI Field-Level Validation
 
-Full background: `/context/21-ui-field-validation.md`.
+Full background: `.claude/context/pcf/21-ui-field-validation.md`.
 
 - If a format constraint should hold **everywhere**, regardless of how data enters the system (UI or API) — use **data model validation**.
 - If the valid format legitimately **varies by context** (e.g. country-specific formats shown via different modes) — use a field's `regex` property for **UI-level validation** instead.

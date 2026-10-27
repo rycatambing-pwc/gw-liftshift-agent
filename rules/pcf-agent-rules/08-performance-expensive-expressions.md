@@ -1,10 +1,14 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Performance: Fixing Expensive Expressions
 
-Full anti-pattern background: `/context/19-expensive-expressions.md`.
+Full anti-pattern background: `.claude/context/pcf/19-expensive-expressions.md`.
 
 ## Rule: Hoist a Reused Expensive Expression Into a PCF Variable
 
-If an expensive expression (see the four categories in `/context/19-expensive-expressions.md`) is used in a widget's `value` or `valueRange` property — or referenced by more than one property/widget — don't call it inline each time. Instead:
+If an expensive expression (see the four categories in `.claude/context/pcf/19-expensive-expressions.md`) is used in a widget's `value` or `valueRange` property — or referenced by more than one property/widget — don't call it inline each time. Instead:
 
 1. Create a **PCF-level variable**, initialized using the expensive expression.
 2. Reference the **variable** in the widget property/properties, instead of the raw expensive call.

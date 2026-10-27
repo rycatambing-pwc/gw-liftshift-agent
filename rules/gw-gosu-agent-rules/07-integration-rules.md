@@ -1,6 +1,14 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+---
 # Integration Rules
 
-These rules govern Gosu code that handles XML, JSON, Gosu templates, and Dynamic/Expando types. Violating them produces encoding errors, runtime parse failures, or silently incorrect behavior. Full background: `/context/gosu/integrations/xml-gosu.md`, `/context/gosu/integrations/json-gosu.md`, `/context/gosu/integrations/templates.md`, `/context/gosu/integrations/dynamic-expando.md`.
+These rules govern Gosu code that handles XML, JSON, Gosu templates, and Dynamic/Expando types. Violating them produces encoding errors, runtime parse failures, or silently incorrect behavior. Full background: `.claude/context/gosu/integrations/xml-gosu.md`, `.claude/context/gosu/integrations/json-gosu.md`, `.claude/context/gosu/integrations/templates.md`, `.claude/context/gosu/integrations/dynamic-expando.md`.
 
 ## XML: Use `bytes()` in Production — Never `asUTFString()`
 

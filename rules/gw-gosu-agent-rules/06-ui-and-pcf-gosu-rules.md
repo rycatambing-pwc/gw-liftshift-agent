@@ -1,6 +1,15 @@
+---
+paths:
+  - "**/*.gs"
+  - "**/*.gsx"
+  - "**/*.gr"
+  - "**/*.gst"
+  - "**/*.gsp"
+  - "**/*.pcf"
+---
 # UI and PCF-Embedded Gosu Rules
 
-These rules govern Gosu code written inside PCF files and in UI helper classes. Full background: `/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`, `/context/gosu/ui_and_rules/09-rules-validation-and-entity-names.md`.
+These rules govern Gosu code written inside PCF files and in UI helper classes. Full background: `.claude/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`, `.claude/context/gosu/ui_and_rules/09-rules-validation-and-entity-names.md`.
 
 ## Rule: `validationExpression` Must Return `null` or a Display-Key String — Nothing Else
 
@@ -46,7 +55,7 @@ If multiple fields test the **same** condition independently (e.g. each has `vis
 
 PCF variable scope follows a 4-level lookup: (1) local variable in current scope, (2) iterator element in a `RowIterator`, (3) page-level `Variable` declarations, (4) the PCF root object. Inside a `RowIterator`, the row element is accessed by `elementName`, not through the parent root. Referencing the wrong scope produces silent wrong-value bugs, not compilation errors.
 
-Full details: `/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`.
+Full details: `.claude/context/gosu/ui_and_rules/08-pcf-ui-model-and-embedded-gosu.md`.
 
 ## Rule: Avoid Expensive Logic in `PostOnChange` Handlers
 

@@ -1,6 +1,10 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Navigation Action Syntax Rules
 
-Full conceptual background: `/context/13-navigating-to-locations.md`, `/context/14-location-groups.md`.
+Full conceptual background: `.claude/context/pcf/13-navigating-to-locations.md`, `.claude/context/pcf/14-location-groups.md`.
 
 ## The General Syntax
 
@@ -25,8 +29,8 @@ LocationEntryPoint.method(objectList)
 
 ## Location Group Nesting Rule
 
-Avoid creating multiple nested levels of Location Groups, even though BillingCenter technically supports it. Prefer a flat first-level/second-level structure (per `/context/14-location-groups.md`) unless there's a specific, documented reason to go deeper.
+Avoid creating multiple nested levels of Location Groups, even though BillingCenter technically supports it. Prefer a flat first-level/second-level structure (per `.claude/context/pcf/14-location-groups.md`) unless there's a specific, documented reason to go deeper.
 
 ## Naming Rule
 
-Location Group PCF files don't require a specific extension, but should use the **`Group`** suffix as good practice (e.g. `AccountGroup`, `DesktopGroup`). Combine with the `_Ext` convention for custom groups — exact ordering/interaction not yet confirmed; see `/unresolved/01-open-questions.md`.
+Location Group PCF files don't require a specific extension, but should use the **`Group`** suffix as good practice (e.g. `AccountGroup`, `DesktopGroup`). Combine with the `_Ext` convention for custom groups — exact ordering/interaction not yet confirmed; see `.claude/context/pcf/open-questions.md`.

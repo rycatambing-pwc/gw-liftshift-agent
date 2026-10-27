@@ -1,6 +1,10 @@
+---
+paths:
+  - "**/*.pcf"
+---
 # Validation Expression Rules
 
-Full background: `/context/22-validation-expressions.md`.
+Full background: `.claude/context/pcf/22-validation-expressions.md`.
 
 ## Rule: Default to `validationExpression`
 
